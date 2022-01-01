@@ -1,0 +1,160 @@
+{
+  "name": "cabinetplugin",
+  "displayName": "cabinet-plugin",
+  "description": "Cabinet Plugin",
+  "version": "0.0.3",
+  "engines": {
+    "vscode": "^1.63.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boan-anbo/cabinetplugin.git"
+  },
+  "activationEvents": [
+    "onCommand:cabinetplugin.startCabinet",
+    "onCommand:cabinetplugin.showPreview",
+    "onCommand:cabinetplugin.searchCards"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cabinetContainer",
+          "title": "Cabinet",
+          "icon": "resources/light/refresh.svg"
+        }
+      ]
+    },
+    "views": {
+      "cabinetContainer": [
+        {
+          "id": "nodeDependencies",
+          "name": "Cabinet Outline"
+        }
+      ],
+      "explorer": [
+        {
+          "id": "cabinetOutline",
+          "name": "Cabinet Outline",
+          "icon": "media/dep.svg"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "cabinetOutline.refresh",
+          "when": "view == cabinetOutline",
+          "group": "navigation"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "resourceLangId == markdown",
+          "command": "cabinetplugin.showPreview",
+          "alt": "cabinetplugin.showPreview",
+          "group": "navigation"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "cabinetOutline.goToLine",
+        "title": "Go to Line"
+      },
+      {
+        "command": "cabinetOutline.refresh",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "cabinetplugin.stopCabinet",
+        "title": "Stop",
+        "category": "Cabinet"
+      },
+      {
+        "command": "cabinetplugin.startCabinet",
+        "title": "Start",
+        "category": "Cabinet"
+      },
+      {
+        "command": "cabinetplugin.showPreview",
+        "title": "Show Preview",
+        "category": "Cabinet"
+      },
+      {
+        "command": "cabinetplugin.fetchCardsFromApi",
+        "title": "Fetch Cards in the Document From API",
+        "category": "Cabinet"
+      },
+      {
+        "command": "cabinetplugin.searchCards",
+        "title": "Search Cards",
+        "category": "Cabinet"
+      },
+      {
+        "title": "Enable CodeLens",
+        "command": "cabinetplugin.enableCodeLens",
+        "category": "Cabinet"
+      },
+      {
+        "title": "Disable Codelens",
+        "command": "cabinetplugin.disableCodeLens",
+        "category": "Cabinet"
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "cabinetplugin.enableCodeLens": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "recompile": "npm i && npm link cabinet-node && npm run compile",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.2.5",
+    "webpack": "^5.52.1",
+    "webpack-cli": "^4.8.0",
+    "@vscode/test-electron": "^1.6.2",
+    "@types/cors": "^2.8.12",
+    "@types/glob": "^7.1.4",
+    "@types/markdown-it": "^12.2.3",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "14.x",
+    "@types/vscode": "^1.63.1",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
+    "@types/express": "^4.17.13",
+    "eslint": "^8.1.0",
+    "glob": "^7.1.7",
+    "mocha": "^9.1.3",
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "follow-redirects": "^1.14.6",
+    "markdown-it": "^12.3.0"
+  }
+}
