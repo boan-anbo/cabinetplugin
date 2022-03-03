@@ -260,7 +260,7 @@ function generatePointButtons() {
     // add to vscode button
     if (vscode) {
 
-        const text = point.innerText;
+        let text = point.innerText;
       const vscodeButton = document.createElement("button");
       // use vs code blue for the background color of the button
       vscodeButton.style.color = "#007acc";
@@ -271,6 +271,11 @@ function generatePointButtons() {
       vscodeButton.style.padding = '6px';
       vscodeButton.innerText = "+";
       vscodeButton.onclick = function ()  {
+
+        if (point.tagName === 'UL') {
+          text = text.split('\n').join('\n- ');
+          
+        }
         // change background color to green
         point.style.backgroundColor = "lightgreen";
         // change text color to white
