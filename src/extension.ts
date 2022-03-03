@@ -3,11 +3,10 @@
 
 import { CabinetNode } from 'cabinet-node';
 import * as vscode from 'vscode';
-import { cardsCompletionProvider } from './cabinet-core/cards-completion-provider';
 
 import { cardLookupProvider } from './cabinet-core/card-lookup';
 import { searchCardsCommand } from './cabinet-core/commands/search-cards-command';
-import { cabinetPreviewPanel, showPreview, showPreviewCommand } from './cabinet-core/webviews/preview-panel';
+import { showPreviewCommand, togglePreviewSyncCommand } from './cabinet-core/webviews/preview-panel';
 import { CabinetNodeApi } from './api/cabinet-node-api';
 import path = require('path');
 import fs = require('fs');
@@ -16,10 +15,14 @@ import { CabinetApi } from 'cabinet-node/build/main/lib/card-client';
 import { fetchCardsFromApiCommand } from './cabinet-core/commands/fetch-cci-cards-from-api';
 import { registerStatusBar, removeStatusBarItem, updateStatusBarItem } from './cabinet-core/status-bars/cabinet-status-bar';
 import { pullMarkdownCodeLensProvider, pullMarkdownCommand } from './cabinet-core/code-lenses/pull-markdown-codelens-provider';
-import { insertText } from './cabinet-core/utils/insert-text';
-import { openSourceCodeLensProvider, openSourceCommand } from './cabinet-core/code-lenses/open-source-codelens-provider';
+import { openSourceCodeLensProvider } from './cabinet-core/code-lenses/open-source-codelens-provider';
 import { CabinetNotesProvider } from './treeviews/cabinetnotes-provider';
 import { goToLineCommand } from './cabinet-core/commands/go-to-line-command';
+import { outputPreviewHtml } from './cabinet-core/commands/outputPreviewHtml';
+import { cardTitleCodeLensProvider, clickCardTitleCommand } from './cabinet-core/code-lenses/card-title-provider';
+import { copyLatexCodeLensProvider, copyLatexCommand } from './cabinet-core/code-lenses/copy-latex';
+import { updateDefaultSettings } from './cabinet-core/utils/update-default-setting';
+import { openCardSourceFile } from './cabinet-core/utils/open-source-file';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -34,10 +37,12 @@ async function loadCabinetNode() {
 		vscode.window.showErrorMessage('No workspace folder is opened.');
 		return;
 	}
-	const folderUri = workspaces[0].uri;
+	const workspaceRootFilePath = workspaces[0].uri.fsPath;
+
+	const defaultCabinetFileName = 'cabinet.json';
 
 
-	const filePathToCreate = path.join(folderUri.fsPath, 'cabinet.json');
+	const filePathToCreate = path.join(workspaceRootFilePath, defaultCabinetFileName);
 
 	if (!fs.existsSync(filePathToCreate)) {
 
@@ -48,7 +53,7 @@ async function loadCabinetNode() {
 			);
 
 		if (result === "Yes") {
-			cabinetNodeInstance = new CabinetNode(folderUri.fsPath, 'cabinet.json');
+			cabinetNodeInstance = new CabinetNode(workspaceRootFilePath, defaultCabinetFileName);
 
 			return cabinetNodeInstance;
 		} else {
@@ -56,7 +61,7 @@ async function loadCabinetNode() {
 			return;
 		}
 	} else {
-		cabinetNodeInstance = new CabinetNode(folderUri.fsPath, 'cabinet.json');
+		cabinetNodeInstance = new CabinetNode(workspaceRootFilePath, defaultCabinetFileName);
 
 		return cabinetNodeInstance;
 	}
@@ -104,26 +109,24 @@ export async function activate(context: vscode.ExtensionContext) {
 	stopCabinet();
 
 
-
-
-
-
-
-
-
-	let stopCabinetCmd = vscode.commands.registerCommand('cabinetplugin.stopCabinet', async () => {
+	vscode.commands.registerCommand('cabinetplugin.stopCabinet', async () => {
 		stopCabinet();
 	});
 
 
-	context.subscriptions.push(stopCabinetCmd);
+	// update all default settings, otherwise some global settings will keep the state when Cabinet restarts, such as preview sync with editor;
+	updateDefaultSettings();
 
-	let startCabinet = vscode.commands.registerCommand('cabinetplugin.startCabinet', () => {
+
+	// context.subscriptions.push(stopCabinetCmd);
+
+	vscode.commands.registerCommand('cabinetplugin.startCabinet', () => {
 		// vscode.window.showInformationMessage('Hello World from Cabinet!');
 		if (cabinetNodeInstance !== undefined) {
 			vscode.window.showInformationMessage('Cabinet is already running!');
 			return;
 		}
+
 		loadCabinetNode();
 
 
@@ -135,30 +138,41 @@ export async function activate(context: vscode.ExtensionContext) {
 				treeDataProvider: cabinetNodeOutlineProvider
 			});
 
-			vscode.window.createTreeView('nodeDependencies',{
+			vscode.window.createTreeView('nodeDependencies', {
 				treeDataProvider: new CabinetNotesProvider()
 
-			} );
+			});
 
 
-			vscode.commands.registerCommand("cabinetOutline.goToLine", goToLineCommand);
+			const goToLineCommandSub = vscode.commands.registerCommand("cabinetOutline.goToLine", goToLineCommand);
+			context.subscriptions.push(goToLineCommandSub);
 
-			vscode.commands.registerCommand('cabinetOutline.refresh', () => cabinetNodeOutlineProvider.refresh());
+
+			context.subscriptions.push(vscode.commands.registerCommand('cabinetOutline.refresh', () => cabinetNodeOutlineProvider.refresh()));
 
 			const outlineRefreshListener = vscode.workspace.onDidChangeTextDocument(() => {
 				vscode.commands.executeCommand('cabinetOutline.refresh');
 			});
+			context.subscriptions.push(outlineRefreshListener);
 
-			disposables.push(outlineRefreshListener);
 
 			// register codelens providers.
+
+			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.clickCardTitle", clickCardTitleCommand));
+
 			vscode.languages.registerCodeLensProvider("*", pullMarkdownCodeLensProvider);
 
-			vscode.commands.registerCommand("cabinetplugin.pullMarkdown", pullMarkdownCommand);
+			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.pullMarkdown", pullMarkdownCommand));
 
 			vscode.languages.registerCodeLensProvider("*", openSourceCodeLensProvider);
 
-			vscode.commands.registerCommand("cabinetplugin.openSource", openSourceCommand);
+			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.openSource", openCardSourceFile));
+
+			vscode.languages.registerCodeLensProvider("*", cardTitleCodeLensProvider);
+
+			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.copyLatex", copyLatexCommand));
+
+			vscode.languages.registerCodeLensProvider("*", copyLatexCodeLensProvider);
 
 			// others
 
@@ -171,7 +185,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			initCabinetNodeApi(cabinetNodeInstance);
 
 			// search cards command
-			context.subscriptions.push();
 			context.subscriptions.push(
 				vscode.commands.registerCommand('cabinetplugin.searchCards', searchCardsCommand(cabinetNodeInstance))
 			);
@@ -179,6 +192,13 @@ export async function activate(context: vscode.ExtensionContext) {
 			context.subscriptions.push(cardLookupProvider(cabinetNodeInstance));
 
 			context.subscriptions.push(showPreviewCommand(cabinetNodeInstance));
+
+			context.subscriptions.push(
+				vscode.commands.registerCommand('cabinetplugin.togglePreviewSync', togglePreviewSyncCommand())
+			);
+
+			// write html preview to file command
+			context.subscriptions.push(outputPreviewHtml(cabinetNodeInstance));
 
 			context.subscriptions.push(
 				vscode.commands.registerCommand('cabinetplugin.fetchCardsFromApi', fetchCardsFromApiCommand(cabinetNodeInstance))
@@ -193,10 +213,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			updateCurrentCards();
 
+			disposables = context.subscriptions;
+
 		}
 
 	});
-	context.subscriptions.push(startCabinet);
+	// context.subscriptions.push(startCabinet);
 
 }
 
@@ -214,7 +236,7 @@ export const updateCurrentCards = (cardsNum?: string, filePath?: string) => {
 // this method is called when your extension is deactivated
 export async function deactivate() {
 
-	await stopCabinet();
+
 
 	disposables.forEach(disposable => disposable.dispose());
 
@@ -223,11 +245,13 @@ export async function deactivate() {
 
 
 export const stopCabinet = async () => {
+	await deactivate();
 	if (cabinetNodeInstance) {
 		cabinetNodeInstance = undefined;
 		await cabinetNodeApi.stopServer();
 		vscode.window.showInformationMessage('Cabinet stopped.');
 		await stopChangePreviewListener();
 		await removeStatusBarItem();
+
 	}
 }

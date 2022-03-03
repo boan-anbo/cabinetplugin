@@ -69,9 +69,14 @@ export class OpenSourceCodeLensProvider implements vscode.CodeLensProvider {
 
                 const card = cabinetNodeInstance?.getCardByCci(cci);
 
+
+                const citeKey = card?.source?.uniqueId ?? '';
+                const pageIndex = card?.source?.pageIndex ?? '';
+                const citeKeyText = `[${citeKey}|${pageIndex}]`;
+
                 if (card?.source?.filePath && vscode.workspace.getConfiguration("cabinetplugin").get("enableCodeLens", true)) {
                     codeLens.command = {
-                        title: 'Open Source',
+                        title: citeKeyText,
                         tooltip: `Open ${card.source.filePath}`,
                         command: "cabinetplugin.openSource",
                         arguments: [card.id]
@@ -96,29 +101,5 @@ export class OpenSourceCodeLensProvider implements vscode.CodeLensProvider {
     }
 }
 
-export function openSourceCommand(cardId: string) {
-
-    const card = cabinetNodeInstance?.getCardById(cardId);
-    if (!card) {
-        return;
-    }
-
-    // insert markdown to the range in current editor
-    // card.openFile(`C:\\Program Files (x86)\\Foxit Software\\Foxit PhantomPDF\\FoxitPDFEditor.exe`);
-
-    const readerExecutable = `C:\\Program Files (x86)\\Foxit Software\\Foxit PhantomPDF\\FoxitPDFEditor.exe`;
-    const filePath = card?.source?.filePath;
-    // check if filePath exists
-    if (!filePath || !fs.existsSync(filePath)) {
-        throw new Error('File path is not set\n' + filePath);
-    }
-
-    execFile(readerExecutable, [
-        filePath,
-        "/A",
-        card.source?.pageIndex ? "page=" + card.source.pageIndex : "",
-    ])
-
-}
 
 export const openSourceCodeLensProvider = new OpenSourceCodeLensProvider();

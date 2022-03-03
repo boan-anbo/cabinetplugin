@@ -15,8 +15,6 @@ export const getCurrentCards =  (): Card[] |null => {
     // Get the document last line.
     if (editor) {
         const doc = editor.document.getText();
-
-        console.log('GOot doc', doc);
         const cards = cabinetNodeInstance?.getAllCardsByCciFromText(doc);
         return cards ?? [];
     }

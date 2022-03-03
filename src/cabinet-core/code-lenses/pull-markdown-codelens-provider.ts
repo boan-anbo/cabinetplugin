@@ -62,6 +62,7 @@ export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
             const cardId = cci.id;
 
 
+
             if (cci && vscode.workspace.getConfiguration("cabinetplugin").get("enableCodeLens", true)) {
                 codeLens.command = {
                     title: 'Md',
