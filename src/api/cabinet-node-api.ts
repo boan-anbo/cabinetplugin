@@ -8,6 +8,7 @@ import { CabinetNode, Card } from 'cabinet-node';
 import * as cors from 'cors';
 import { Server } from 'http';
 import { getCurrentCards } from '../cabinet-core/utils/get-current_documents';
+import { InsertOption } from '../cabinet-core/types/insert-option';
 
 
 
@@ -61,11 +62,16 @@ export class CabinetNodeApi {
     });
 
 
-    const getInsertOption = (request: Request) => {
+    const getInsertOption = (request: Request): InsertOption => {
+      console.log(request.body);
 
+      const firstLineText = request.query.firstLineText?.toString() ?? '';
+      const linesBefore = parseInt(request.query.linesBefore as string, 10);
       const linesAfter = parseInt(request.query.linesAfter as string, 10);
       const select = Boolean(request.query.select);
       return {
+        firstLineText,
+        linesBefore,
         linesAfter,
         select
       };

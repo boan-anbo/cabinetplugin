@@ -2,7 +2,7 @@
   "name": "cabinetplugin",
   "displayName": "cabinet-plugin",
   "description": "Cabinet Plugin",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -58,10 +58,20 @@
           "command": "cabinetplugin.showPreview",
           "alt": "cabinetplugin.showPreview",
           "group": "navigation"
+        },
+        {
+          "command": "cabinetplugin.togglePreviewSync",
+          "alt": "cabinetplugin.togglePreviewSync",
+          "group": "navigation"
         }
       ]
     },
     "commands": [
+      {
+        "command": "cabinetplugin.startCabinet",
+        "title": "Start",
+        "category": "Cabinet"
+      },
       {
         "command": "cabinetOutline.goToLine",
         "title": "Go to Line"
@@ -80,13 +90,18 @@
         "category": "Cabinet"
       },
       {
-        "command": "cabinetplugin.startCabinet",
-        "title": "Start",
+        "command": "cabinetplugin.showPreview",
+        "title": "Show Preview",
         "category": "Cabinet"
       },
       {
-        "command": "cabinetplugin.showPreview",
-        "title": "Show Preview",
+        "command": "cabinetplugin.togglePreviewSync",
+        "title": "Toggle Preview Sync",
+        "category": "Cabinet"
+      },
+      {
+        "command": "cabinetplugin.outputPreviewHtml",
+        "title": "Output Preview Html",
         "category": "Cabinet"
       },
       {
@@ -111,8 +126,21 @@
       }
     ],
     "configuration": {
+      "title": "Cabinet",
       "properties": {
         "cabinetplugin.enableCodeLens": {
+          "type": "boolean",
+          "default": true
+        },
+        "cabinetplugin.collapsablePreview": {
+          "type": "boolean",
+          "default": true
+        },
+        "cabinetplugin.previewInBlockquote": {
+          "type": "boolean",
+          "default": true
+        },
+        "cabinetplugin.syncPreviewWithEditor": {
           "type": "boolean",
           "default": true
         }

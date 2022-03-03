@@ -44,7 +44,6 @@ export class CabinetNotesProvider implements vscode.TreeDataProvider<CardItem> {
         if (editor) {
             const doc = editor.document.getText();
 
-            console.log('GOot doc', doc);
             const cards = cabinetNodeInstance?.parseMdStructure(doc) ?? [];
             const result = cards.map(point => {
                 return CardItem.fromPoint(point);

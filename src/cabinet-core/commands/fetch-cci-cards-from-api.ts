@@ -22,7 +22,6 @@ export const fetchCardsFromApiCommand = (cabinetInstance: CabinetNode)  => {
             const documentType = editor.document.languageId;
             if (documentType === 'markdown' || documentType === 'latex' || documentType === 'plaintext') {
                 const documentText = editor.document.getText();
-                console.log(documentText);
 
                 // const cards = cabinetInstance.extractAllCcisFromText(documentText);
                 updateStatusBarItem('Fetching cards from api...');

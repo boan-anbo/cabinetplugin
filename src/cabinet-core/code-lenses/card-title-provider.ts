@@ -6,7 +6,7 @@ import { cabinetNodeInstance } from '../../extension';
 /**
  * CodelensProvider
  */
-export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
+export class CardTitleCodeLensProvider implements vscode.CodeLensProvider {
 
     private codeLenses: vscode.CodeLens[] = [];
     private regex: RegExp;
@@ -61,13 +61,17 @@ export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
 
             const cardId = cci.id;
 
+            // Get the card
+            const card = cabinetNodeInstance?.getCardById(cardId);
+
+            const title: string = card?.title ?? "Card";
 
 
             if (cci && vscode.workspace.getConfiguration("cabinetplugin").get("enableCodeLens", true)) {
                 codeLens.command = {
-                    title: 'Md',
-                    tooltip: "Pull markdown for the card",
-                    command: "cabinetplugin.pullMarkdown",
+                    title: title.substring(0, 20),
+                    tooltip: "Copy card title",
+                    command: "cabinetplugin.clickCardTitle",
                     arguments: [
                         cardId,
                         codeLens.range]
@@ -80,7 +84,7 @@ export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
     }
 }
 
-export function pullMarkdownCommand(cardId: string, range: vscode.Range) {
+export function clickCardTitleCommand(cardId: string, range: vscode.Range) {
 
 
     const card = cabinetNodeInstance?.getCardById(cardId);
@@ -88,22 +92,21 @@ export function pullMarkdownCommand(cardId: string, range: vscode.Range) {
         return;
     }
 
-    // insert markdown to the range in current editor
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        return;
-    }
+
+    
 
     const markdown = card.toMarkdown();
     if (!markdown) {
         return;
     }
 
-    editor.edit(textEditorEdit => {
-        console.log('Inserting', range, markdown);
-        textEditorEdit.insert(new vscode.Position(range.start.line + 2, range.start.character), markdown);
-    });
+    // copy to clipboard
+    const clipboard = vscode.env.clipboard;
+    clipboard.writeText(markdown);
+
+    // show message
+    vscode.window.showInformationMessage(`Markdown copied to clipboard.`);
 
 }
 
-export const pullMarkdownCodeLensProvider = new PullMarkdownCodeLensProvider();
+export const cardTitleCodeLensProvider = new CardTitleCodeLensProvider();

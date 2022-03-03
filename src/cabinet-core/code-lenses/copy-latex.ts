@@ -6,7 +6,7 @@ import { cabinetNodeInstance } from '../../extension';
 /**
  * CodelensProvider
  */
-export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
+export class CopyLatexCodeLensProvider implements vscode.CodeLensProvider {
 
     private codeLenses: vscode.CodeLens[] = [];
     private regex: RegExp;
@@ -62,12 +62,11 @@ export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
             const cardId = cci.id;
 
 
-
             if (cci && vscode.workspace.getConfiguration("cabinetplugin").get("enableCodeLens", true)) {
                 codeLens.command = {
-                    title: 'Md',
-                    tooltip: "Pull markdown for the card",
-                    command: "cabinetplugin.pullMarkdown",
+                    title: 'Latex',
+                    tooltip: "Copy latex snippet",
+                    command: "cabinetplugin.copyLatex",
                     arguments: [
                         cardId,
                         codeLens.range]
@@ -80,7 +79,7 @@ export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
     }
 }
 
-export function pullMarkdownCommand(cardId: string, range: vscode.Range) {
+export function copyLatexCommand(cardId: string, range: vscode.Range) {
 
 
     const card = cabinetNodeInstance?.getCardById(cardId);
@@ -88,22 +87,18 @@ export function pullMarkdownCommand(cardId: string, range: vscode.Range) {
         return;
     }
 
-    // insert markdown to the range in current editor
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        return;
-    }
+    const citeKey = card.source?.uniqueId ?? "";
+    const pageIndex = card.source?.pageIndex ?? "";
 
-    const markdown = card.toMarkdown();
-    if (!markdown) {
-        return;
-    }
+    const latexSnippet = `\\autocite[][pageIndex]{${citeKey}}`;
 
-    editor.edit(textEditorEdit => {
-        console.log('Inserting', range, markdown);
-        textEditorEdit.insert(new vscode.Position(range.start.line + 2, range.start.character), markdown);
-    });
+    // copy to clipboard
+    const clipboard = vscode.env.clipboard;
+    clipboard.writeText(latexSnippet);
+
+    // show message
+    vscode.window.showInformationMessage(`Latex snippet copied to clipboard.`);
 
 }
 
-export const pullMarkdownCodeLensProvider = new PullMarkdownCodeLensProvider();
+export const copyLatexCodeLensProvider = new CopyLatexCodeLensProvider();
