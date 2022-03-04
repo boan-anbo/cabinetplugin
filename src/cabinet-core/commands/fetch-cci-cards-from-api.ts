@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { updateCurrentCards } from "../../extension";
 import { showInsertCardsMd } from "../dialogs/show-insert-cards-md";
 import { showSearchInputBox } from "../dialogs/show-search-cards-input";
-import { updateStatusBarItem } from "../status-bars/cabinet-status-bar";
+import { updateStatusBarText } from "../status-bars/cabinet-status-bar";
 import { insertText } from "../utils/insert-text";
 
 
@@ -24,9 +24,9 @@ export const fetchCardsFromApiCommand = (cabinetInstance: CabinetNode)  => {
                 const documentText = editor.document.getText();
 
                 // const cards = cabinetInstance.extractAllCcisFromText(documentText);
-                updateStatusBarItem('Fetching cards from api...');
+                updateStatusBarText('Fetching cards from api...');
                 const cards = await cabinetInstance.fetchAllCardsFromText(documentText);
-                updateStatusBarItem(`${cards?.length} cards fetched.`);
+                updateStatusBarText(`${cards?.length} cards fetched.`);
 
                 if (cards && cards.length > 0) {
                     const result = await vscode.window.showInformationMessage(

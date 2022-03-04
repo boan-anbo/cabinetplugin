@@ -1,4 +1,4 @@
-import { CabinetCardIdentifier, CabinetNode } from 'cabinet-node';
+import { CabinetCardIdentifier, CabinetNode, Card } from 'cabinet-node';
 import * as vscode from 'vscode';
 import { MarkdownOption } from 'cabinet-node';
 import { getPreviewHtmlTemplate } from '../utils/get-preview-html-template';
@@ -6,6 +6,7 @@ import { text } from 'body-parser';
 import { insertText } from '../utils/insert-text';
 import { InsertOption } from '../types/insert-option';
 import { openCardSourceFile } from '../utils/open-source-file';
+import { getAllCardPlaces, getCurrentlyUsedCards } from '../utils/get-current_cards';
 
 export const showPreviewCommand = (cabinetInstance: CabinetNode) => vscode.commands.registerCommand('cabinetplugin.showPreview', async () => {
 
@@ -80,6 +81,14 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
                 }
 
                 switch (message.command) {
+                    case 'updateUsedCardsInPreview':
+                        // if no active editor, use the last used editor.
+                        if (!vscode.window.activeTextEditor) {
+                            await vscode.commands.executeCommand("workbench.action.focusFirstEditorGroup");
+                        }
+                        updateUsedCardsInPreview();
+                        // add current editor document title to the end of the preview panel title
+                        return;
                     case 'addCCI':
                         await insertText(
                             `{${message.text}}`
@@ -93,7 +102,6 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
                         return;
                     case 'addPoint':
                         // refocus last active editor
-
                         await insertText(
                             `- ${message.text}`
 
@@ -105,10 +113,10 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
 
                         vscode.window.showInformationMessage("Point Inserted");
                         return;
-                        case 'openFile':
-                            const cardId = JSON.parse(message.text) as CabinetCardIdentifier;
-                            openCardSourceFile(cardId.id);
-                            return;
+                    case 'openFile':
+                        const cardId = JSON.parse(message.text) as CabinetCardIdentifier;
+                        openCardSourceFile(cardId.id);
+                        return;
                 }
             },
             undefined,
@@ -154,6 +162,39 @@ export const freePreviewSync = async () => {
 
 }
 
+export const postMessageToPreviewPanel = async (message: any) => {
+    await cabinetPreviewPanel?.webview.postMessage(message);
+}
+
+export const sendUpdateCardRequestToPreviewPanelCommand = (cabinetNode: CabinetNode): vscode.Disposable => {
+    // add a vscode command
+    const updatePreviewUsedCardsCommand = vscode.commands.registerCommand('cabinetplugin.updateUsedCardsInPreview', updateUsedCardsInPreview);
+
+    return updatePreviewUsedCardsCommand;
+
+};
+
+export const updateUsedCardsInPreview = async () => {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        return;
+    }
+    console.log('asking webview to update used cards');
+    const allCardPlaces = getAllCardPlaces();
+    postMessageToPreviewPanel({
+        command: 'updateUsedCards',
+        text: JSON.stringify(allCardPlaces),
+    });
+
+    // get current editor document title file Name only
+
+    const currentDocumentTitle = vscode.window.activeTextEditor?.document.fileName.split(/[\/\\]/).pop();
+    if (cabinetPreviewPanel) {
+        const cleanTitle = cabinetPreviewPanel?.title.split('| Used in')[0].trim();
+        cabinetPreviewPanel.title = cleanTitle + ` | Used in | ${currentDocumentTitle}`;
+    }
+}
+
 export const togglePreviewSync = async () => {
     const syncPreviewWithEditor = await vscode.workspace.getConfiguration('cabinetplugin').get('syncPreviewWithEditor') ?? true;
     // toggle sync preview with editor
@@ -174,3 +215,5 @@ export const togglePreviewSync = async () => {
         }
     }
 }
+
+
