@@ -14,9 +14,7 @@
     "url": "https://github.com/boan-anbo/cabinetplugin.git"
   },
   "activationEvents": [
-    "onCommand:cabinetplugin.startCabinet",
-    "onCommand:cabinetplugin.showPreview",
-    "onCommand:cabinetplugin.searchCards"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -63,6 +61,11 @@
           "command": "cabinetplugin.togglePreviewSync",
           "alt": "cabinetplugin.togglePreviewSync",
           "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == markdown && editorFocus",
+          "command": "cabinetplugin.updateUsedCardsInPreview",
+          "group": "navigation"
         }
       ]
     },
@@ -70,6 +73,11 @@
       {
         "command": "cabinetplugin.startCabinet",
         "title": "Start",
+        "category": "Cabinet"
+      },
+      {
+        "command": "cabinetplugin.updateUsedCardsInPreview",
+        "title": "[C] Preview Used Cards",
         "category": "Cabinet"
       },
       {
@@ -91,12 +99,12 @@
       },
       {
         "command": "cabinetplugin.showPreview",
-        "title": "Show Preview",
+        "title": "[C] Preview",
         "category": "Cabinet"
       },
       {
         "command": "cabinetplugin.togglePreviewSync",
-        "title": "Toggle Preview Sync",
+        "title": "[C] Sync Preview",
         "category": "Cabinet"
       },
       {

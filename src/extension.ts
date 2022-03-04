@@ -6,14 +6,14 @@ import * as vscode from 'vscode';
 
 import { cardLookupProvider } from './cabinet-core/card-lookup';
 import { searchCardsCommand } from './cabinet-core/commands/search-cards-command';
-import { showPreviewCommand, togglePreviewSyncCommand } from './cabinet-core/webviews/preview-panel';
+import { sendUpdateCardRequestToPreviewPanelCommand, showPreviewCommand, togglePreviewSyncCommand } from './cabinet-core/webviews/preview-panel';
 import { CabinetNodeApi } from './api/cabinet-node-api';
 import path = require('path');
 import fs = require('fs');
 import { markdownChangePreviewListener, stopChangePreviewListener } from './cabinet-core/liseners/mardown-change-preview-listener';
 import { CabinetApi } from 'cabinet-node/build/main/lib/card-client';
 import { fetchCardsFromApiCommand } from './cabinet-core/commands/fetch-cci-cards-from-api';
-import { registerStatusBar, removeStatusBarItem, updateStatusBarItem } from './cabinet-core/status-bars/cabinet-status-bar';
+import { cabinetStatusBarOff, registerStatusBar, removeStatusBarItem, updateStatusBarText } from './cabinet-core/status-bars/cabinet-status-bar';
 import { pullMarkdownCodeLensProvider, pullMarkdownCommand } from './cabinet-core/code-lenses/pull-markdown-codelens-provider';
 import { openSourceCodeLensProvider } from './cabinet-core/code-lenses/open-source-codelens-provider';
 import { CabinetNotesProvider } from './treeviews/cabinetnotes-provider';
@@ -85,6 +85,13 @@ async function initCabinetNodeApi(cabinetNode: CabinetNode | undefined) {
 
 
 export async function activate(context: vscode.ExtensionContext) {
+
+	// others
+
+	// context.subscriptions.push(registerStatusBar());
+	// I'm not pushing it into subscriptions otherwise it will be disposed when Cabinet is turned off.
+	registerStatusBar();
+
 
 	// vscode.window.registerTreeDataProvider(
 	// 	'cabinetCards',
@@ -160,23 +167,20 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.clickCardTitle", clickCardTitleCommand));
 
-			vscode.languages.registerCodeLensProvider("*", pullMarkdownCodeLensProvider);
+			context.subscriptions.push(vscode.languages.registerCodeLensProvider("*", pullMarkdownCodeLensProvider));
 
 			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.pullMarkdown", pullMarkdownCommand));
 
-			vscode.languages.registerCodeLensProvider("*", openSourceCodeLensProvider);
+			context.subscriptions.push(vscode.languages.registerCodeLensProvider("*", openSourceCodeLensProvider));
 
 			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.openSource", openCardSourceFile));
 
-			vscode.languages.registerCodeLensProvider("*", cardTitleCodeLensProvider);
+			context.subscriptions.push(vscode.languages.registerCodeLensProvider("*", cardTitleCodeLensProvider));
 
 			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.copyLatex", copyLatexCommand));
 
-			vscode.languages.registerCodeLensProvider("*", copyLatexCodeLensProvider);
+			context.subscriptions.push(vscode.languages.registerCodeLensProvider("*", copyLatexCodeLensProvider));
 
-			// others
-
-			registerStatusBar();
 
 			(cabinetNodeInstance as CabinetNode).onCabinetFileChangeLoaded = updateCurrentCards;
 
@@ -204,6 +208,8 @@ export async function activate(context: vscode.ExtensionContext) {
 				vscode.commands.registerCommand('cabinetplugin.fetchCardsFromApi', fetchCardsFromApiCommand(cabinetNodeInstance))
 			);
 
+			// register update cards in preview command
+			context.subscriptions.push(sendUpdateCardRequestToPreviewPanelCommand(cabinetNodeInstance));
 
 			vscode.workspace.onDidChangeTextDocument(markdownChangePreviewListener);
 
@@ -229,7 +235,7 @@ export const updateCurrentCards = (cardsNum?: string, filePath?: string) => {
 	}
 
 	if (cardsNum) {
-		updateStatusBarItem(`${cardsNum} cards.`);
+		updateStatusBarText(`${cardsNum} cards.`);
 	}
 }
 
@@ -251,7 +257,8 @@ export const stopCabinet = async () => {
 		await cabinetNodeApi.stopServer();
 		vscode.window.showInformationMessage('Cabinet stopped.');
 		await stopChangePreviewListener();
-		await removeStatusBarItem();
+		cabinetStatusBarOff();
+		// await removeStatusBarItem();
 
 	}
 }

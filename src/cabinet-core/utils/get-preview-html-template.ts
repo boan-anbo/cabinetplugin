@@ -163,6 +163,29 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
     #goBottomButton:hover {
       background-color: #555; /* Add a dark-grey background on hover */
     }
+    #updateCards {
+      display: block; /* Hidden by default */
+      position: fixed; /* Fixed/sticky position */
+      top: 20px; /* Place the button at the bottom of the page */
+      right: 100px; /* Place the button 30px from the right */
+      z-index: 99; /* Make sure it does not overlap */
+      border: none; /* Remove borders */
+      outline: none; /* Remove outline */
+      background-color: rgb(166, 255, 0); /* Set a background color */
+      color: black; /* Text color */
+      cursor: pointer; /* Add a mouse pointer on hover */
+      padding: 15px; /* Some padding */
+      border-radius: 10px; /* Rounded corners */
+      font-size: 10px; /* Increase font size */
+    }
+
+    #updateCards:hover {
+      background-color: rgb(
+        136,
+        209,
+        0
+      ); /* Add a dark-grey background on hover */
+    }
 
       </style>
   </head>
@@ -170,134 +193,276 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
   
   <button onclick="topFunction()" id="goToTopButton" title="Go to top">Top</button>
   <button onclick="bottomFunction()" id="goBottomButton" title="Go to Bottom">Bottom</button>
+  <button onclick="askVscodeForUsedCards()" id="updateCards" title="Update Cards">Used Cards</button>
   ${insertHtml}
 
-    <script>
-const goTopButton = document.getElementById("goToTopButton");
-const goBottomButton = document.getElementById("goBottomButton");
+  <script>
+    const goTopButton = document.getElementById("goToTopButton");
+    const goBottomButton = document.getElementById("goBottomButton");
 
-window.onscroll = function() {scrollFunction()};
+    window.onscroll = function () {
+      scrollFunction();
+    };
 
-function scrollFunction() {
-  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    goTopButton.style.display = "block";
-  } else {
-    goTopButton.style.display = "none";
-  }
-}
-
-function topFunction() {
-  document.body.scrollTop = 0; // For Safari
-  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-}
-function bottomFunction() {
-  window.scrollTo(0, document.body.scrollHeight);
-}
-
-
-function generateCCIButtons() {
-  const allCodes = Array.from(document.querySelectorAll("code"))
-  const allCCIs = allCodes.filter(code => code.innerText.startsWith('{') && code.innerText.endsWith('}'))
-
-  allCCIs.forEach(cci => {
-
-      const cciString = cci.innerText;
-    // copy button
-    const copyButton = document.createElement("button");
-    copyButton.innerText = "Copy";
-    copyButton.onclick = () => {
-      navigator.clipboard.writeText(cciString);
-    }
-
-    cci.parentNode.insertBefore(copyButton, cci);
-    // add to vscode button
-    if (vscode) {
-      const vscodeButton = document.createElement("button");
-      // use vs code blue for the background color of the button
-      vscodeButton.style.backgroundColor = "#007acc";
-      vscodeButton.style.color = "#f8f8f2";
-      vscodeButton.innerText = "Add Card";
-      vscodeButton.onclick = () => {
-        const text = cci.innerText;
-        vscode.postMessage({
-          command: 'addCCI',
-          text: cciString
-        });
+    function scrollFunction() {
+      if (
+        document.body.scrollTop > 20 ||
+        document.documentElement.scrollTop > 20
+      ) {
+        goTopButton.style.display = "block";
+      } else {
+        goTopButton.style.display = "none";
       }
-
-
-    cci.parentNode.insertBefore(vscodeButton, cci.parentNode.firstChild); 
     }
 
-      // add open file button
-    if (vscode) {
-      const openFileButton = document.createElement("button");
-      // use vs code blue for the background color of the button
-      openFileButton.innerText = "Open";
-      openFileButton.onclick = () => {
-        const text = cci.innerText;
-        vscode.postMessage({
-          command: 'openFile',
-          text: cciString
-        });
-      }
-
-    cci.parentNode.insertBefore(openFileButton, cci);
+    function topFunction() {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    }
+    function bottomFunction() {
+      window.scrollTo(0, document.body.scrollHeight);
     }
 
-  });
+    function getAllCciElements() {
+      const allCodes = Array.from(document.querySelectorAll("code"));
+      const allCCIs = allCodes.filter(
+        (code) =>
+          code.innerText.startsWith("{") && code.innerText.endsWith("}")
+      );
+      return allCCIs;
+    }
 
-  console.log(allCCIs)
-}
-const vscode = typeof acquireVsCodeApi === "function" ? acquireVsCodeApi() : undefined;
-console.log('Checking if this is in vscode', {vscode})
+    function generateCCIButtons() {
+      const allCCIs = getAllCciElements();
+      allCCIs.forEach((cci) => {
+        const cciString = cci.innerText;
+        // copy button
+        const copyButton = document.createElement("button");
+        copyButton.innerText = "Copy";
+        copyButton.onclick = () => {
+          navigator.clipboard.writeText(cciString);
+        };
 
-function generatePointButtons() {
-  // get all elements
-  const allPoints = Array.from(document.querySelectorAll("ul, li, h1, h2, h3, h4, h5, h6, blockquote, code"))
-  // add add to vscode button before the elements
-  allPoints.forEach(point => {
-    // add to vscode button
-    if (vscode) {
+        cci.parentNode.insertBefore(copyButton, cci);
+        // add to vscode button
+        if (vscode) {
+          const vscodeButton = document.createElement("button");
+          // use vs code blue for the background color of the button
+          vscodeButton.style.backgroundColor = "#007acc";
+          vscodeButton.style.color = "#f8f8f2";
+          vscodeButton.innerText = "Add Card";
+          vscodeButton.onclick = () => {
+            const text = cci.innerText;
+            vscode.postMessage({
+              command: "addCCI",
+              text: cciString,
+            });
+          };
 
-        let text = point.innerText;
-      const vscodeButton = document.createElement("button");
-      // use vs code blue for the background color of the button
-      vscodeButton.style.color = "#007acc";
-      vscodeButton.style.background = 'Transparent';
-      // button no border
-      vscodeButton.style.border = 'none';
-      vscodeButton.style.outline = 'none';
-      vscodeButton.style.padding = '6px';
-      vscodeButton.innerText = "+";
-      vscodeButton.onclick = function ()  {
-
-        if (point.tagName === 'UL') {
-          text = text.split('\n').join('\n- ');
-          
+          cci.parentNode.insertBefore(
+            vscodeButton,
+            cci.parentNode.firstChild
+          );
         }
-        // change background color to green
-        point.style.backgroundColor = "lightgreen";
-        // change text color to white
-        vscode.postMessage({
-          command: 'addPoint',
-          text: text
-        });
-      }
 
-      // insert button after the element
-      point.prepend(vscodeButton);
+        // add open file button
+        if (vscode) {
+          const openFileButton = document.createElement("button");
+          // use vs code blue for the background color of the button
+          openFileButton.innerText = "Open";
+          openFileButton.onclick = () => {
+            const text = cci.innerText;
+            vscode.postMessage({
+              command: "openFile",
+              text: cciString,
+            });
+          };
+
+          cci.parentNode.insertBefore(openFileButton, cci);
+        }
+      });
+
+      console.log(allCCIs);
+    }
+
+    function generatePointButtons() {
+      // get all elements
+      const allPoints = Array.from(
+        document.querySelectorAll(
+          "ul, li, h1, h2, h3, h4, h5, h6, blockquote, code"
+        )
+      );
+
+      // add add to vscode button before the text points.
+      allPoints.forEach((point) => {
+        if (vscode) {
+          let text = point.innerText;
+          const addPointButton = document.createElement("button");
+          // use vs code blue for the background color of the button
+          addPointButton.style.color = "#007acc";
+          addPointButton.style.background = "Transparent";
+          // button no border
+          addPointButton.style.border = "none";
+          addPointButton.style.outline = "none";
+          addPointButton.style.padding = "6px";
+          addPointButton.innerText = "+";
+          addPointButton.onclick = function () {
+            let finalText = text;
+            // need to create a new variable for text. manipulate the text reference directly will change the value of the original elment.
+            if (point.tagName === "UL") {
+              finalText = finalText.split("\\n").join("\\n- ");
+            }
+            // change background color to green
+            point.style.backgroundColor = "lightgreen";
+            // change text color to white
+            vscode.postMessage({
+              command: "addPoint",
+              text: finalText,
+            });
+          };
+
+          // insert button after the element
+          point.parentNode.insertBefore(addPointButton, point);
+        }
+      });
+    }
+
+    function getDocumentCards() {
+      const results = [
+        {
+          id: "88110f81-9ccc-4528-b7e6-a0cf3a42b59b",
+          line: 3,
+          text: "this is the point the card is related to",
+        },
+      ];
+
+      return results;
+    }
+
+    // remove all divs with the class name of 'usedCardDiv';
+    function removeAllUsedCardDivs() {
+      const usedCardDivs = Array.from(
+        document.querySelectorAll(".usedCardDiv")
+      );
+      usedCardDivs.forEach((div) => {
+        div.remove();
+      });
 
     }
-  })
-}
+    function getUsedCardLabels(cardPlaces) {
+      // create a label element to insert before the current element
+      const allCardPlaceElements = [];
+      cardPlaces.forEach((cardPlace) => {
+        // creating an div to describe where and for what line the card is used.
+        const div = document.createElement("div");
+        div.className = "usedCardDiv";
+        div.innerText = "Used: [L] " + cardPlace.line + ": " + cardPlace.text;
+        div.style.paddingTop = "4px";
+        div.style.marginTop = "4px";
+        div.style.paddingLeft = "8px";
+        div.style.marginBottom = "4px";
+        div.style.paddingBottom = "4px";
+        div.style.backgroundColor = "green";
+        div.style.color = "white";
+        // add a button to jump to the line
+        const jumpToLineButton = document.createElement("button");
+        jumpToLineButton.style.marginLeft = "8px";
+        jumpToLineButton.style.marginRight = "8px";
+        jumpToLineButton.innerText = "Go";
+        // attach a function to the button to post message back to vscode to nativage to the line where the card is used.
+        jumpToLineButton.onclick = () => {
+          vscode.postMessage({
+            command: "jumpToLine",
+            line: cardPlace.line,
+          });
+        };
+        // add button to element
+        div.appendChild(jumpToLineButton);
+        allCardPlaceElements.push(div);
+      });
+      return allCardPlaceElements;
+    }
 
+    // get all the cards used in the current document. Match the used cards with the elements with same id. If id is matched, mark the card with a different color so the user knows that the card has been used already and can see where it is used in the document and navigate to the line.
+    function markUsedCards(usedCardPlaces) {
 
-generateCCIButtons()
+      console.log("Checking if cards are used against", usedCardPlaces);
+      const allCciElements = getAllCciElements();
+      allCciElements.forEach((cci) => {
+        const cciString = cci.innerText;
+        const cciObject = JSON.parse(cciString);
+        console.log("Checking cards in the HTML", cciObject);
+        if (
+          usedCardPlaces.some((cardPlace) => cardPlace.id === cciObject.id)
+        ) {
+          console.log("Found used card", cci);
+          // set its grandparent background back to lightest blue
+          cci.parentNode.parentNode.style.backgroundColor = "#e0f2f1";
 
-generatePointButtons();
+          const allUsedPlacesOfTheCard = usedCardPlaces.filter(
+            (cardPlace) => cardPlace.id === cciObject.id
+          );
+          const allUsedCardElements = getUsedCardLabels(
+            allUsedPlacesOfTheCard
+          );
 
-      </script>
+          // insert all the usedCard Elements above the cci element
+          allUsedCardElements.forEach((usedCardElement) => {
+            cci.parentNode.insertBefore(usedCardElement, cci);
+          });
+        }
+        {
+          {
+            /*  console.log(cciObject);  */
+          }
+        }
+      });
+    }
+
+    function attachUpdateCardsListener() {
+
+    window.addEventListener('message', event => {
+      const message = event.data;
+      
+      switch (message.command) {
+        case "updateUsedCards":
+          console.log("received mark used cards request for", message.text);
+
+        // clear previously added used card divs if any
+        removeAllUsedCardDivs();
+
+          const usedCardPlaces = JSON.parse(message.text);
+          console.log("parsed used cards objects received by webview", usedCardPlaces);
+          if (usedCardPlaces && Array.isArray(usedCardPlaces) && usedCardPlaces.length > 0) {
+            markUsedCards(usedCardPlaces);
+          }
+          break;
+        }
+      });
+    }
+    // init
+    let vscode =
+      typeof acquireVsCodeApi === "function" ? acquireVsCodeApi() : undefined;
+
+    console.log("Checking if this is in vscode", { vscode });
+
+    generateCCIButtons();
+
+    if (vscode) {
+      generatePointButtons();
+
+      attachUpdateCardsListener();
+      
+    }
+    function askVscodeForUsedCards() {
+      if (vscode) {
+        vscode.postMessage({
+          command: "updateUsedCardsInPreview",
+        });
+      }
+    };
+
+  </script>
 
   </body>
   </html>`;

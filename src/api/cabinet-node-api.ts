@@ -7,7 +7,7 @@ import { insertText } from '../cabinet-core/utils/insert-text';
 import { CabinetNode, Card } from 'cabinet-node';
 import * as cors from 'cors';
 import { Server } from 'http';
-import { getCurrentCards } from '../cabinet-core/utils/get-current_documents';
+import { getCurrentlyUsedCards } from '../cabinet-core/utils/get-current_cards';
 import { InsertOption } from '../cabinet-core/types/insert-option';
 
 
@@ -91,7 +91,7 @@ export class CabinetNodeApi {
 
     // get all cards in current document
     this.app.get('/currentCards', async function (request: Request, response: Response) {
-      const cards = getCurrentCards();
+      const cards = getCurrentlyUsedCards();
 
       console.log(cards);
       response.json(cards);
