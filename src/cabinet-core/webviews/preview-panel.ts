@@ -7,6 +7,7 @@ import { insertText } from '../utils/insert-text';
 import { InsertOption } from '../types/insert-option';
 import { openCardSourceFile } from '../utils/open-source-file';
 import { getAllCardPlaces, getCurrentlyUsedCards } from '../utils/get-current_cards';
+import { goToLine } from '../commands/go-to-line-command';
 
 export const showPreviewCommand = (cabinetInstance: CabinetNode) => vscode.commands.registerCommand('cabinetplugin.showPreview', async () => {
 
@@ -117,6 +118,9 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
                         const cardId = JSON.parse(message.text) as CabinetCardIdentifier;
                         openCardSourceFile(cardId.id);
                         return;
+                    case 'jumpToLine':
+                        const lineNumber = parseInt(message.text);
+                        goToLine(lineNumber);
                 }
             },
             undefined,
