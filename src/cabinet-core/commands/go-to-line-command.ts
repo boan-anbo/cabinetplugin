@@ -7,7 +7,7 @@ import { insertText } from "../utils/insert-text";
 
 
 // jump to line in current active editor
-export function goToLineCommand(line: number) {
+export function goToLine(line: number) {
 
 
     const editor = vscode.window.activeTextEditor;

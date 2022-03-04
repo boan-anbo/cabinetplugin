@@ -356,7 +356,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
         // creating an div to describe where and for what line the card is used.
         const div = document.createElement("div");
         div.className = "usedCardDiv";
-        div.innerText = "Used: [L] " + cardPlace.line + ": " + cardPlace.text;
+        div.innerText = "Used: [" + cardPlace.line + "] | " + cardPlace.lineText;
         div.style.paddingTop = "4px";
         div.style.marginTop = "4px";
         div.style.paddingLeft = "8px";

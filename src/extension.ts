@@ -17,7 +17,7 @@ import { cabinetStatusBarOff, registerStatusBar, removeStatusBarItem, updateStat
 import { pullMarkdownCodeLensProvider, pullMarkdownCommand } from './cabinet-core/code-lenses/pull-markdown-codelens-provider';
 import { openSourceCodeLensProvider } from './cabinet-core/code-lenses/open-source-codelens-provider';
 import { CabinetNotesProvider } from './treeviews/cabinetnotes-provider';
-import { goToLineCommand } from './cabinet-core/commands/go-to-line-command';
+import { goToLine } from './cabinet-core/commands/go-to-line-command';
 import { outputPreviewHtml } from './cabinet-core/commands/outputPreviewHtml';
 import { cardTitleCodeLensProvider, clickCardTitleCommand } from './cabinet-core/code-lenses/card-title-provider';
 import { copyLatexCodeLensProvider, copyLatexCommand } from './cabinet-core/code-lenses/copy-latex';
@@ -151,7 +151,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			});
 
 
-			const goToLineCommandSub = vscode.commands.registerCommand("cabinetOutline.goToLine", goToLineCommand);
+			const goToLineCommandSub = vscode.commands.registerCommand("cabinetOutline.goToLine", goToLine);
 			context.subscriptions.push(goToLineCommandSub);
 
 
