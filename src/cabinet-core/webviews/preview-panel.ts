@@ -8,6 +8,7 @@ import { InsertOption } from '../types/insert-option';
 import { openCardSourceFile } from '../utils/open-source-file';
 import { getAllCardPlaces, getCurrentlyUsedCards } from '../utils/get-current_cards';
 import { goToLine } from '../commands/go-to-line-command';
+import { CardPlace } from '../types/card-place';
 
 export const showPreviewCommand = (cabinetInstance: CabinetNode) => vscode.commands.registerCommand('cabinetplugin.showPreview', async () => {
 
@@ -99,7 +100,8 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
                                 focusFirstEditorGroup: true,
                             } as InsertOption);
 
-                        vscode.window.showInformationMessage("CCI Inserted");
+                        vscode.window.showInformationMessage("Card Inserted");
+                        updateUsedCardsInPreview();
                         return;
                     case 'addPoint':
                         // refocus last active editor
@@ -119,8 +121,9 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
                         openCardSourceFile(cardId.id);
                         return;
                     case 'jumpToLine':
-                        const lineNumber = parseInt(message.text);
-                        goToLine(lineNumber);
+                        const { line, documentUri } = JSON.parse(message.cardPlace) as CardPlace;
+                        goToLine(line, documentUri);
+                        return;
                 }
             },
             undefined,
