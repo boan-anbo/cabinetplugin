@@ -34,7 +34,10 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
       content:counter(section) "." counter(subsection) "." counter(subsubsection) "." counter(subsubsubsection) " ";
       }
 
-
+      
+      .hidden {
+        display: none;
+      }
     body {
 
       counter-reset:section;
@@ -187,6 +190,54 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
       ); /* Add a dark-grey background on hover */
     }
 
+    #toggle-all-cards-button {
+      display: block; /* Hidden by default */
+      position: fixed; /* Fixed/sticky position */
+      top: 20px; /* Place the button at the bottom of the page */
+      left: 30px; /* Place the button 30px from the right */
+      z-index: 99; /* Make sure it does not overlap */
+      border: none; /* Remove borders */
+      outline: none; /* Remove outline */
+      background-color: rgb(166, 255, 0); /* Set a background color */
+      color: black; /* Text color */
+      cursor: pointer; /* Add a mouse pointer on hover */
+      padding: 15px; /* Some padding */
+      border-radius: 10px; /* Rounded corners */
+      font-size: 10px; /* Increase font size */
+    }
+
+    #toggle-all-cards-button:hover {
+      background-color: rgb(
+        136,
+        209,
+        0
+      ); /* Add a dark-grey background on hover */
+    }
+    #toggle-used-cards-button {
+      display: block; /* Hidden by default */
+      position: fixed; /* Fixed/sticky position */
+      top: 20px; /* Place the button at the bottom of the page */
+      left: 130px; /* Place the button 30px from the right */
+      z-index: 99; /* Make sure it does not overlap */
+      border: none; /* Remove borders */
+      outline: none; /* Remove outline */
+      background-color: rgb(166, 255, 0); /* Set a background color */
+      color: black; /* Text color */
+      cursor: pointer; /* Add a mouse pointer on hover */
+      padding: 15px; /* Some padding */
+      border-radius: 10px; /* Rounded corners */
+      font-size: 10px; /* Increase font size */
+    }
+
+    #toggle-used-cards-button:hover {
+      background-color: rgb(
+        136,
+        209,
+        0
+      ); /* Add a dark-grey background on hover */
+    }
+
+
       </style>
   </head>
   <body>
@@ -194,6 +245,8 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
   <button onclick="topFunction()" id="goToTopButton" title="Go to top">Top</button>
   <button onclick="bottomFunction()" id="goBottomButton" title="Go to Bottom">Bottom</button>
   <button onclick="askVscodeForUsedCards()" id="updateCards" title="Update Cards">Used Cards</button>
+  <button onclick="toggleCardsDisplay()" id="toggle-all-cards-button" title="Show or Hide Cards">Toggle Cards</button>
+  <button onclick="toggleAllUsedCardsDisplay()" id="toggle-used-cards-button" title="Show or Hide Cards">Toggle Used Cards</button>
   ${insertHtml}
 
   <script>
@@ -342,7 +395,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
     // remove all divs with the class name of 'usedCardDiv';
     function removeAllUsedCardDivs() {
       const usedCardDivs = Array.from(
-        document.querySelectorAll(".usedCardDiv")
+        document.querySelectorAll(".used-card-div")
       );
       usedCardDivs.forEach((div) => {
         div.remove();
@@ -355,8 +408,8 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
       cardPlaces.forEach((cardPlace) => {
         // creating an div to describe where and for what line the card is used.
         const div = document.createElement("div");
-        div.className = "usedCardDiv";
-        div.innerText = "Used: [" + cardPlace.line + "] | " + cardPlace.lineText;
+        div.className = "used-card-div";
+        div.innerText = "Used: [" + cardPlace.line + "] ";
         div.style.paddingTop = "4px";
         div.style.marginTop = "4px";
         div.style.paddingLeft = "8px";
@@ -373,7 +426,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
         jumpToLineButton.onclick = () => {
           vscode.postMessage({
             command: "jumpToLine",
-            line: cardPlace.line,
+            cardPlace: JSON.stringify(cardPlace),
           });
         };
         // add button to element
@@ -443,6 +496,9 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
     // init
     let vscode =
       typeof acquireVsCodeApi === "function" ? acquireVsCodeApi() : undefined;
+    let isAllCardsShown = true;
+
+    let isUsedCardsShown = true;
 
     console.log("Checking if this is in vscode", { vscode });
 
@@ -461,6 +517,75 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
         });
       }
     };
+    function hideAllCards() {
+      const allBlockquoteEls = document.querySelectorAll("blockquote");
+      allBlockquoteEls.forEach((el) => {
+         el.classList.add("hidden");
+      });
+      isAllCardsShown = false;
+    }
+
+
+
+    function showAllCards() {
+
+      const allBlockquoteEls = document.querySelectorAll("blockquote");
+
+      // add hidden class to all blockquote elements
+      allBlockquoteEls.forEach((el) => {
+        // hide the element by adding className of 'hidden'
+        el.classList.remove("hidden");
+      });
+    
+      isAllCardsShown = true;
+    }
+
+    function toggleCardsDisplay() {
+      if (isAllCardsShown) {
+        hideAllCards();
+      } else {
+        showAllCards();
+      }
+    }
+
+    function hideAllUsedCards() {
+      const usedCardDivs = Array.from(
+        document.querySelectorAll(".used-card-div")
+      );
+      console.log("hiding all used cards", usedCardDivs);
+      usedCardDivs.forEach((div) => {
+        div.parentNode.parentNode.classList.add("hidden");
+      });
+      isUsedCardsShown = false;
+    }
+
+    function showAllUsedCards() {
+      const usedCardDivs = Array.from(
+        document.querySelectorAll(".used-card-div")
+      );
+      usedCardDivs.forEach((div) => {
+        div.parentNode.parentNode.parentNode.classList.remove("hidden");
+
+      });
+      isUsedCardsShown = true;
+    }
+
+    function toggleAllUsedCardsDisplay() {
+      // if all cards are hiddle, show used cards directly
+
+      if (isAllCardsShown && isUsedCardsShown) {
+        hideAllUsedCards();
+      } else if (!isAllCardsShown && !isUsedCardsShown) {
+        showAllUsedCards();
+      } else if (isAllCardsShown && !isUsedCardsShown) {
+        hideAllCards();
+        showAllUsedCards();
+      } else if (!isAllCardsShown && isUsedCardsShown) {
+        hideAllCards();
+      }
+
+
+    }
 
   </script>
 

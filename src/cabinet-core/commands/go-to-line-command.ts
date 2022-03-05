@@ -7,10 +7,24 @@ import { insertText } from "../utils/insert-text";
 
 
 // jump to line in current active editor
-export function goToLine(line: number) {
+export async function goToLine(line: number, documentUri?: string) {
 
+    let editor = undefined;
 
-    const editor = vscode.window.activeTextEditor;
+    if (!documentUri) {
+
+        editor = vscode.window.activeTextEditor;
+    } else {
+        // searching in visible editors
+        editor = vscode.window.visibleTextEditors.find(e => e.document.uri.toString() === documentUri);
+        if (!editor) {
+            // open document in a new editor
+            const doc = await vscode.workspace.openTextDocument(documentUri)
+            // show the editor with the doc
+            editor = await vscode.window.showTextDocument(doc);
+        }
+    }
+
     if (editor) {
 
         const position = new vscode.Position(line, 0);

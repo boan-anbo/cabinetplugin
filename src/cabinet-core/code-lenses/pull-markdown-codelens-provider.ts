@@ -46,6 +46,10 @@ export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
     public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
         const editor = vscode.window.activeTextEditor;
 
+        if (!codeLens.command) {
+            console.error("Missing codelands command", codeLens)
+        }
+
         if (editor) {
             let document = editor.document;
 
@@ -56,7 +60,7 @@ export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
             const cci = CabinetCardIdentifier.fromCciMarker(documentText);
 
             if (!cci) {
-                return;
+                return null;
             }
 
             const cardId = cci.id;
@@ -74,6 +78,7 @@ export class PullMarkdownCodeLensProvider implements vscode.CodeLensProvider {
                 };
                 return codeLens;
             }
+            return null;
         }
 
         return null;

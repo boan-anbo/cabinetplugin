@@ -27,10 +27,12 @@ export const getAllCardPlaces = (): CardPlace[] => {
     if (!cards) {
         return [];
     }
-    const allCardPlaces = [];
-    // go through editor and find all card places
+    const allCardPlaces: CardPlace[] = [];
+    // get active editor
     const editor = vscode.window.activeTextEditor;
+
     if (editor) {
+        const documentUri = editor.document.uri.toString();
         // check each line of the document to see if it contains a card by id
         const allLines = editor.document.lineCount;
         for (let line = 0; line < allLines; line++) {
@@ -40,9 +42,10 @@ export const getAllCardPlaces = (): CardPlace[] => {
                 allCardPlaces.push({
                     card,
                     id: card.id,
-                    line: line + 1,
+                    line: line,
                     column: 0,
-                    lineText
+                    lineText,
+                    documentUri
                 });
             }
         }
