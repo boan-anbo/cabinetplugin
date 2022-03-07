@@ -1,100 +1,138 @@
 export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
-  return `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${title}</title>
-      
-      <style>
-      h1 {counter-reset:subsection;}
-      h1:before
-      {
-      counter-increment:section;
-      content:"\\00A7 " counter(section) " ";
-          font-weight:bold;
-      }
+return `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+
+  <style>
+    h1 {
+      counter-reset: section1;
+    }
+
+    h1:before {
+      counter-increment: section1;
+      content: "\\00A7 "counter(section1) " ";
+      font-weight: bold;
+    }
 
 
-      h2:before
-      {
-      counter-increment:subsection;
-      content: counter(section) "." counter(subsection) " ";
-      }
+    h2:before {
+      counter-increment: section2;
+      content: counter(section1) "."counter(section2) " ";
+    }
 
-      h3:before
-      {
-      counter-increment:subsubsection;
-      content:counter(section) "." counter(subsection) "." counter(subsubsection) " ";
-      }
+    h3:before {
+      counter-increment: section3;
+      content: counter(section1) "."counter(section2) "."counter(section3) " ";
+    }
 
-      h4:before
-      {
-      counter-increment:subsubsubsection;
-      content:counter(section) "." counter(subsection) "." counter(subsubsection) "." counter(subsubsubsection) " ";
-      }
+    h4:before {
+      counter-increment: section4;
+      content: counter(section1) "."counter(section2) "."counter(section3) "."counter(section4) " ";
+    }
 
-      
-      .hidden {
-        display: none;
-      }
+    h5:before {
+      counter-increment: section5;
+      content: counter(section1) "."counter(section2) "."counter(section3) "."counter(section4) "."counter(section5);
+    }
+
+    .hidden {
+      display: none;
+    }
+
     body {
 
-      counter-reset:section;
+      counter-reset: section1;
 
       background-color: rgba(255, 255, 255, 0.952);
-      word-break: break-word; 
+      word-break: break-word;
       max-width: 1027px;
 
     }
-    h1   {
+
+    h1 {
       background-color: rgb(120, 33, 190);
       color: white;
       margin-top: 2em;
       margin-bottom: 1em;
       padding-top: 0.2em;
       padding-bottom: 0.2em;
+      font-size: 2.5em;
     }
-    h2   {
+
+    h2 {
       text-indent: 0.8em;
-      counter-reset: subsubsection;
+      counter-reset: section2;
       color: rgb(0, 19, 102);
       text-decoration: underline;
       margin-top: 1.5em;
       margin-bottom: 1em;
+      font-size: 2em;
     }
-    h3   {
 
-      counter-reset: subsubsubsection;
+    h3 {
+
+      counter-reset: section3;
       text-indent: 1.6em;
       color: rgb(0, 26, 143);
+      text-decoration: underline;
+      margin-top: 1.5em;
       margin-top: 1em;
       margin-bottom: 0.5em;
+      font-size: 1.8em;
     }
-    h4   {
+
+    h4 {
+      counter-reset: section4;
       text-indent: 2.4em;
       color: rgb(0, 35, 190);
+      text-decoration: underline;
+      margin-top: 1.5em;
+      font-size: 1.5em;
     }
-    p    {color: rgb(31, 31, 31);}
+
+    h5 {
+      counter-reset: section5;
+      text-indent: 3.4em;
+      color: rgb(0, 41, 226);
+      text-decoration: underline;
+      margin-top: 1.5em;
+      font-size: 1.2em;
+    }
+
+    p {
+      color: rgb(31, 31, 31);
+    }
+
     code {
-      color: rgb(0, 81, 92); 
-      background-color: rgba(0, 148, 185, 0.103);
+      color: rgb(0, 81, 92);
       font-weight: bold;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      line-height: 1.5em;
     }
+
     blockquote {
       border-radius: 30px;
       padding: 0.5em;
       background-color: rgba(215, 238, 188, 0.322);
     }
+
     pre {
-      background-color: rgb(0, 102, 116);
-      color:rgb(0, 9, 51);
+      background-color: rgba(255, 255, 255, 0.281);
+      color: rgb(0, 9, 51);
       overflow-x: auto;
       white-space: pre-wrap;
       white-space: -moz-pre-wrap;
       white-space: -pre-wrap;
       white-space: -o-pre-wrap;
       word-wrap: break-word;
+      padding-left: 30px;
+      padding-right: 30px;
     }
 
     .table-of-contents {
@@ -108,6 +146,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
       margin: 0.5em;
       background-color: rgb(249, 255, 231);
     }
+
     .table-of-contents a:link {
       color: rgb(11, 80, 170);
     }
@@ -118,8 +157,11 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
       background-color: rgb(238, 252, 53);
       font-weight: bolder;
       font-size: 1em;
-      padding-top: 0.1em;
-      padding-bottom: 0.1em;
+      margin: 5px;
+      padding-top: 30px;
+      padding-bottom: 30px;
+      padding-left: 20px;
+      border-radius: 30px;
     }
 
     button {
@@ -127,126 +169,192 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
     }
 
     #goToTopButton {
-      display: block; /* Hidden by default */
-      position: fixed; /* Fixed/sticky position */
-      top: 20px; /* Place the button at the bottom of the page */
-      right: 30px; /* Place the button 30px from the right */
-      z-index: 99; /* Make sure it does not overlap */
-      border: none; /* Remove borders */
-      outline: none; /* Remove outline */
-      background-color: red; /* Set a background color */
-      color: white; /* Text color */
-      cursor: pointer; /* Add a mouse pointer on hover */
-      padding: 15px; /* Some padding */
-      border-radius: 10px; /* Rounded corners */
-      font-size: 10px; /* Increase font size */
-    }
-    
-    #goToTopButton:hover {
-      background-color: #555; /* Add a dark-grey background on hover */
+      display: block;
+      /* Hidden by default */
+      position: fixed;
+      /* Fixed/sticky position */
+      top: 20px;
+      /* Place the button at the bottom of the page */
+      right: 30px;
+      /* Place the button 30px from the right */
+      z-index: 99;
+      /* Make sure it does not overlap */
+      border: none;
+      /* Remove borders */
+      outline: none;
+      /* Remove outline */
+      background-color: red;
+      /* Set a background color */
+      color: white;
+      /* Text color */
+      cursor: pointer;
+      /* Add a mouse pointer on hover */
+      padding: 15px;
+      /* Some padding */
+      border-radius: 10px;
+      /* Rounded corners */
+      font-size: 10px;
+      /* Increase font size */
     }
 
-      
+    #goToTopButton:hover {
+      background-color: #555;
+      /* Add a dark-grey background on hover */
+    }
+
+
     #goBottomButton {
-      display: block; /* Hidden by default */
-      position: fixed; /* Fixed/sticky position */
-      bottom: 20px; /* Place the button at the bottom of the page */
-      right: 30px; /* Place the button 30px from the right */
-      z-index: 99; /* Make sure it does not overlap */
-      border: none; /* Remove borders */
-      outline: none; /* Remove outline */
-      background-color: rgb(0, 89, 255); /* Set a background color */
-      color: white; /* Text color */
-      cursor: pointer; /* Add a mouse pointer on hover */
-      padding: 15px; /* Some padding */
-      border-radius: 10px; /* Rounded corners */
-      font-size: 10px; /* Increase font size */
+      display: block;
+      /* Hidden by default */
+      position: fixed;
+      /* Fixed/sticky position */
+      bottom: 20px;
+      /* Place the button at the bottom of the page */
+      right: 30px;
+      /* Place the button 30px from the right */
+      z-index: 99;
+      /* Make sure it does not overlap */
+      border: none;
+      /* Remove borders */
+      outline: none;
+      /* Remove outline */
+      background-color: rgb(0, 89, 255);
+      /* Set a background color */
+      color: white;
+      /* Text color */
+      cursor: pointer;
+      /* Add a mouse pointer on hover */
+      padding: 15px;
+      /* Some padding */
+      border-radius: 10px;
+      /* Rounded corners */
+      font-size: 10px;
+      /* Increase font size */
     }
-    
+
     #goBottomButton:hover {
-      background-color: #555; /* Add a dark-grey background on hover */
+      background-color: #555;
+      /* Add a dark-grey background on hover */
     }
+
     #updateCards {
-      display: block; /* Hidden by default */
-      position: fixed; /* Fixed/sticky position */
-      top: 20px; /* Place the button at the bottom of the page */
-      right: 100px; /* Place the button 30px from the right */
-      z-index: 99; /* Make sure it does not overlap */
-      border: none; /* Remove borders */
-      outline: none; /* Remove outline */
-      background-color: rgb(166, 255, 0); /* Set a background color */
-      color: black; /* Text color */
-      cursor: pointer; /* Add a mouse pointer on hover */
-      padding: 15px; /* Some padding */
-      border-radius: 10px; /* Rounded corners */
-      font-size: 10px; /* Increase font size */
+      display: block;
+      /* Hidden by default */
+      position: fixed;
+      /* Fixed/sticky position */
+      top: 20px;
+      /* Place the button at the bottom of the page */
+      right: 100px;
+      /* Place the button 30px from the right */
+      z-index: 99;
+      /* Make sure it does not overlap */
+      border: none;
+      /* Remove borders */
+      outline: none;
+      /* Remove outline */
+      background-color: rgb(166, 255, 0);
+      /* Set a background color */
+      color: black;
+      /* Text color */
+      cursor: pointer;
+      /* Add a mouse pointer on hover */
+      padding: 15px;
+      /* Some padding */
+      border-radius: 10px;
+      /* Rounded corners */
+      font-size: 10px;
+      /* Increase font size */
     }
 
     #updateCards:hover {
-      background-color: rgb(
-        136,
-        209,
-        0
-      ); /* Add a dark-grey background on hover */
+      background-color: rgb(136,
+          209,
+          0);
+      /* Add a dark-grey background on hover */
     }
 
     #toggle-all-cards-button {
-      display: block; /* Hidden by default */
-      position: fixed; /* Fixed/sticky position */
-      top: 20px; /* Place the button at the bottom of the page */
-      left: 30px; /* Place the button 30px from the right */
-      z-index: 99; /* Make sure it does not overlap */
-      border: none; /* Remove borders */
-      outline: none; /* Remove outline */
-      background-color: rgb(166, 255, 0); /* Set a background color */
-      color: black; /* Text color */
-      cursor: pointer; /* Add a mouse pointer on hover */
-      padding: 15px; /* Some padding */
-      border-radius: 10px; /* Rounded corners */
-      font-size: 10px; /* Increase font size */
+      display: block;
+      /* Hidden by default */
+      position: fixed;
+      /* Fixed/sticky position */
+      top: 20px;
+      /* Place the button at the bottom of the page */
+      left: 30px;
+      /* Place the button 30px from the right */
+      z-index: 99;
+      /* Make sure it does not overlap */
+      border: none;
+      /* Remove borders */
+      outline: none;
+      /* Remove outline */
+      background-color: rgb(166, 255, 0);
+      /* Set a background color */
+      color: black;
+      /* Text color */
+      cursor: pointer;
+      /* Add a mouse pointer on hover */
+      padding: 15px;
+      /* Some padding */
+      border-radius: 10px;
+      /* Rounded corners */
+      font-size: 10px;
+      /* Increase font size */
     }
 
     #toggle-all-cards-button:hover {
-      background-color: rgb(
-        136,
-        209,
-        0
-      ); /* Add a dark-grey background on hover */
+      background-color: rgb(136,
+          209,
+          0);
+      /* Add a dark-grey background on hover */
     }
+
     #toggle-used-cards-button {
-      display: block; /* Hidden by default */
-      position: fixed; /* Fixed/sticky position */
-      top: 20px; /* Place the button at the bottom of the page */
-      left: 130px; /* Place the button 30px from the right */
-      z-index: 99; /* Make sure it does not overlap */
-      border: none; /* Remove borders */
-      outline: none; /* Remove outline */
-      background-color: rgb(166, 255, 0); /* Set a background color */
-      color: black; /* Text color */
-      cursor: pointer; /* Add a mouse pointer on hover */
-      padding: 15px; /* Some padding */
-      border-radius: 10px; /* Rounded corners */
-      font-size: 10px; /* Increase font size */
+      display: block;
+      /* Hidden by default */
+      position: fixed;
+      /* Fixed/sticky position */
+      top: 20px;
+      /* Place the button at the bottom of the page */
+      left: 130px;
+      /* Place the button 30px from the right */
+      z-index: 99;
+      /* Make sure it does not overlap */
+      border: none;
+      /* Remove borders */
+      outline: none;
+      /* Remove outline */
+      background-color: rgb(166, 255, 0);
+      /* Set a background color */
+      color: black;
+      /* Text color */
+      cursor: pointer;
+      /* Add a mouse pointer on hover */
+      padding: 15px;
+      /* Some padding */
+      border-radius: 10px;
+      /* Rounded corners */
+      font-size: 10px;
+      /* Increase font size */
     }
 
     #toggle-used-cards-button:hover {
-      background-color: rgb(
-        136,
-        209,
-        0
-      ); /* Add a dark-grey background on hover */
+      background-color: rgb(136,
+          209,
+          0);
+      /* Add a dark-grey background on hover */
     }
+  </style>
+</head>
 
+<body>
 
-      </style>
-  </head>
-  <body>
-  
   <button onclick="topFunction()" id="goToTopButton" title="Go to top">Top</button>
   <button onclick="bottomFunction()" id="goBottomButton" title="Go to Bottom">Bottom</button>
   <button onclick="askVscodeForUsedCards()" id="updateCards" title="Update Cards">Used Cards</button>
   <button onclick="toggleCardsDisplay()" id="toggle-all-cards-button" title="Show or Hide Cards">Toggle Cards</button>
-  <button onclick="toggleAllUsedCardsDisplay()" id="toggle-used-cards-button" title="Show or Hide Cards">Toggle Used Cards</button>
+  <button onclick="toggleAllUsedCardsDisplay()" id="toggle-used-cards-button" title="Show or Hide Cards">Toggle Used
+    Cards</button>
   ${insertHtml}
 
   <script>
@@ -297,7 +405,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
         };
 
         cci.parentNode.insertBefore(copyButton, cci);
-        // add to vscode button
+        // add to vscode markdown button
         if (vscode) {
           const vscodeButton = document.createElement("button");
           // use vs code blue for the background color of the button
@@ -308,6 +416,27 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
             const text = cci.innerText;
             vscode.postMessage({
               command: "addCCI",
+              text: cciString,
+            });
+          };
+
+          cci.parentNode.insertBefore(
+            vscodeButton,
+            cci.parentNode.firstChild
+          );
+        }
+
+        // add to vscode latex button
+        if (vscode) {
+          const vscodeButton = document.createElement("button");
+          // use vs code blue for the background color of the button
+          vscodeButton.style.backgroundColor = "#007acc";
+          vscodeButton.style.color = "#f8f8f2";
+          vscodeButton.innerText = "Latex";
+          vscodeButton.onclick = () => {
+            const text = cci.innerText;
+            vscode.postMessage({
+              command: "insertLatex",
               text: cciString,
             });
           };
@@ -474,22 +603,22 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
 
     function attachUpdateCardsListener() {
 
-    window.addEventListener('message', event => {
-      const message = event.data;
-      
-      switch (message.command) {
-        case "updateUsedCards":
-          console.log("received mark used cards request for", message.text);
+      window.addEventListener('message', event => {
+        const message = event.data;
 
-        // clear previously added used card divs if any
-        removeAllUsedCardDivs();
+        switch (message.command) {
+          case "updateUsedCards":
+            console.log("received mark used cards request for", message.text);
 
-          const usedCardPlaces = JSON.parse(message.text);
-          console.log("parsed used cards objects received by webview", usedCardPlaces);
-          if (usedCardPlaces && Array.isArray(usedCardPlaces) && usedCardPlaces.length > 0) {
-            markUsedCards(usedCardPlaces);
-          }
-          break;
+            // clear previously added used card divs if any
+            removeAllUsedCardDivs();
+
+            const usedCardPlaces = JSON.parse(message.text);
+            console.log("parsed used cards objects received by webview", usedCardPlaces);
+            if (usedCardPlaces && Array.isArray(usedCardPlaces) && usedCardPlaces.length > 0) {
+              markUsedCards(usedCardPlaces);
+            }
+            break;
         }
       });
     }
@@ -508,7 +637,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
       generatePointButtons();
 
       attachUpdateCardsListener();
-      
+
     }
     function askVscodeForUsedCards() {
       if (vscode) {
@@ -520,7 +649,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
     function hideAllCards() {
       const allBlockquoteEls = document.querySelectorAll("blockquote");
       allBlockquoteEls.forEach((el) => {
-         el.classList.add("hidden");
+        el.classList.add("hidden");
       });
       isAllCardsShown = false;
     }
@@ -536,7 +665,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
         // hide the element by adding className of 'hidden'
         el.classList.remove("hidden");
       });
-    
+
       isAllCardsShown = true;
     }
 
@@ -589,6 +718,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
 
   </script>
 
-  </body>
-  </html>`;
+</body>
+
+</html>`;
 }

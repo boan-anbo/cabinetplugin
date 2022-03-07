@@ -9,6 +9,7 @@ import { openCardSourceFile } from '../utils/open-source-file';
 import { getAllCardPlaces, getCurrentlyUsedCards } from '../utils/get-current_cards';
 import { goToLine } from '../commands/go-to-line-command';
 import { CardPlace } from '../types/card-place';
+import { cabinetNodeInstance } from '../../extension';
 
 export const showPreviewCommand = (cabinetInstance: CabinetNode) => vscode.commands.registerCommand('cabinetplugin.showPreview', async () => {
 
@@ -65,6 +66,8 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
             vscode.ViewColumn.Beside,
             {
                 enableScripts: true,
+                enableFindWidget: true,
+                enableCommandUris: true,
             }
         );
 
@@ -124,6 +127,28 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
                         const { line, documentUri } = JSON.parse(message.cardPlace) as CardPlace;
                         goToLine(line, documentUri);
                         return;
+                    case 'insertLatex':
+                        const cci = CabinetCardIdentifier.fromJsonString(message.text);
+                        if (!cci) {
+                            return;
+                        }
+                        const card = cabinetNodeInstance?.getCardByCci(cci);
+                        if (card) {
+                            await insertText(
+                                `[${card.source?.pageIndex}]{${card.source?.uniqueId}}`
+                                , {
+                                    linesBefore: 0,
+                                    linesAfter: 0,
+                                    focusFirstEditorGroup: true,
+                                } as InsertOption);
+                            await insertText(
+                                `% {${message.text}}`,
+                                {
+                                    linesBefore: 1,
+                                    linesAfter: 1,
+                                    focusFirstEditorGroup: true,
+                                } as InsertOption);
+                        }
                 }
             },
             undefined,

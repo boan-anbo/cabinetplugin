@@ -52,7 +52,7 @@
       ],
       "editor/title": [
         {
-          "when": "resourceLangId == markdown",
+          "when": "resourceLangId == markdown || resourceLangId == latex",
           "command": "cabinetplugin.showPreview",
           "alt": "cabinetplugin.showPreview",
           "group": "navigation"
@@ -63,7 +63,7 @@
           "group": "navigation"
         },
         {
-          "when": "resourceLangId == markdown && editorFocus",
+          "when": "(resourceLangId == markdown || resourceLangId == latex) && editorFocus",
           "command": "cabinetplugin.updateUsedCardsInPreview",
           "group": "navigation"
         }
