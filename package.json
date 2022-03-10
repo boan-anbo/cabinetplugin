@@ -76,6 +76,11 @@
         "category": "Cabinet"
       },
       {
+        "command": "cabinetplugin.fetchPageNotes",
+        "title": "Fetch Page Notes",
+        "category": "Cabinet"
+      },
+      {
         "command": "cabinetplugin.updateUsedCardsInPreview",
         "title": "[C] Preview Used Cards",
         "category": "Cabinet"
@@ -151,6 +156,13 @@
         "cabinetplugin.syncPreviewWithEditor": {
           "type": "boolean",
           "default": true
+        },
+        "cabinetplugin.pdfFolders": {
+          "type": "array",
+          "title": "PDF Folders to Choose From",
+          "default": [
+            "${workspaceRoot}/pdf"
+          ]
         }
       }
     }

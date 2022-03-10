@@ -23,6 +23,9 @@ import { cardTitleCodeLensProvider, clickCardTitleCommand } from './cabinet-core
 import { copyLatexCodeLensProvider, copyLatexCommand } from './cabinet-core/code-lenses/copy-latex';
 import { updateDefaultSettings } from './cabinet-core/utils/update-default-setting';
 import { openCardSourceFile } from './cabinet-core/utils/open-source-file';
+import { ExtensionContext } from 'vscode';
+import { fetchFilePagesCardsInput } from './cabinet-core/inputs/fetch-pages-cards';
+import { quickOpen } from './cabinet-core/inputs/quick-open-file';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -162,6 +165,23 @@ export async function activate(context: vscode.ExtensionContext) {
 			});
 			context.subscriptions.push(outlineRefreshListener);
 
+			// register quickinputs
+			context.subscriptions.push(vscode.commands.registerCommand('cabinetplugin.fetchPageNotes', async () => {
+				const options: { [key: string]: (context: ExtensionContext) => Promise<void> } = {
+					"Fetch Cards on File Pages": fetchFilePagesCardsInput,
+					"Pick File": quickOpen
+				};
+				const quickPick = vscode.window.createQuickPick();
+				quickPick.items = Object.keys(options).map(label => ({ label }));
+				quickPick.onDidChangeSelection(selection => {
+					if (selection[0]) {
+						options[selection[0].label](context)
+							.catch(console.error);
+					}
+				});
+				quickPick.onDidHide(() => quickPick.dispose());
+				quickPick.show();
+			}));
 
 			// register codelens providers.
 
