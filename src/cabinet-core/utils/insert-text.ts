@@ -7,7 +7,6 @@ export const insertText = async (text: string, opt?: InsertOption) => {
 
     if (!vscode.window.activeTextEditor && opt?.focusFirstEditorGroup) {
 
-        // await vscode.commands.executeCommand("workbench.action.focusActiveEditorGroup");
         await vscode.commands.executeCommand("workbench.action.focusFirstEditorGroup");
     }
 

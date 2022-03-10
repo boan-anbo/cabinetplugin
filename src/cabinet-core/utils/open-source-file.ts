@@ -12,8 +12,16 @@ export function openCardSourceFile(cardId: string) {
     // insert markdown to the range in current editor
     // card.openFile(`C:\\Program Files (x86)\\Foxit Software\\Foxit PhantomPDF\\FoxitPDFEditor.exe`);
 
+    if (!card.source?.filePath) {
+        return;
+    }
+    openPdfFile(card.source.filePath, card.source.pageIndex);
+
+
+
+}
+export function openPdfFile(filePath: string, pageNumber?: number) {
     const readerExecutable = `C:\\Program Files (x86)\\Foxit Software\\Foxit PhantomPDF\\FoxitPDFEditor.exe`;
-    const filePath = card?.source?.filePath;
     // check if filePath exists
     if (!filePath || !fs.existsSync(filePath)) {
         throw new Error('File path is not set\n' + filePath);
@@ -22,7 +30,6 @@ export function openCardSourceFile(cardId: string) {
     execFile(readerExecutable, [
         filePath,
         "/A",
-        card.source?.pageIndex ? "page=" + (card.source.pageIndex + 1) : "",
+        pageNumber ? "page=" + (pageNumber + 1) : "",
     ]);
-
 }

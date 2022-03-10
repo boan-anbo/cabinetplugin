@@ -134,21 +134,20 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
                         }
                         const card = cabinetNodeInstance?.getCardByCci(cci);
                         if (card) {
+                            const cciLine = `\%{${message.text}}`;
                             await insertText(
-                                `[${card.source?.pageIndex}]{${card.source?.uniqueId}}`
+                                [
+                                    `[${card.source?.pageIndex}]{${card.source?.uniqueId}}`,
+                                    cciLine,
+                                    ""
+                            ].join('\n')
                                 , {
                                     linesBefore: 0,
                                     linesAfter: 0,
                                     focusFirstEditorGroup: true,
                                 } as InsertOption);
-                            await insertText(
-                                `% {${message.text}}`,
-                                {
-                                    linesBefore: 1,
-                                    linesAfter: 1,
-                                    focusFirstEditorGroup: true,
-                                } as InsertOption);
                         }
+                        return;
                 }
             },
             undefined,

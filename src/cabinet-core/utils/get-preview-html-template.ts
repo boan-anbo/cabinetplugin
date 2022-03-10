@@ -61,7 +61,7 @@ return `
       margin-bottom: 1em;
       padding-top: 0.2em;
       padding-bottom: 0.2em;
-      font-size: 2.5em;
+      font-size: 2.3em;
     }
 
     h2 {
@@ -83,7 +83,8 @@ return `
       margin-top: 1.5em;
       margin-top: 1em;
       margin-bottom: 0.5em;
-      font-size: 1.8em;
+      font-size: 1.6em;
+      line-height: 2em;
     }
 
     h4 {
@@ -92,7 +93,7 @@ return `
       color: rgb(0, 35, 190);
       text-decoration: underline;
       margin-top: 1.5em;
-      font-size: 1.5em;
+      font-size: 1.4em;
     }
 
     h5 {
@@ -118,8 +119,9 @@ return `
 
     blockquote {
       border-radius: 30px;
-      padding: 0.5em;
-      background-color: rgba(215, 238, 188, 0.322);
+      padding: 10px;
+      padding-left: 30px;
+      background-color: rgba(215, 238, 188, 0.582);
     }
 
     pre {
@@ -137,15 +139,17 @@ return `
 
     .table-of-contents {
       border-radius: 30px;
+      font-size: small;
       margin: 2em;
       padding: 0.5em;
       background-color: rgb(249, 255, 231);
     }
 
     .table-of-contents li {
-      margin: 0.5em;
+      margin: 0em;
       background-color: rgb(249, 255, 231);
     }
+
 
     .table-of-contents a:link {
       color: rgb(11, 80, 170);
@@ -158,9 +162,11 @@ return `
       font-weight: bolder;
       font-size: 1em;
       margin: 5px;
-      padding-top: 30px;
-      padding-bottom: 30px;
+      line-height: 2em;
+      padding-top: 10px;
+      padding-bottom: 15px;
       padding-left: 20px;
+      padding-right: 40px;
       border-radius: 30px;
     }
 
@@ -309,6 +315,35 @@ return `
       /* Add a dark-grey background on hover */
     }
 
+    #toggle-all-points-button {
+      display: block;
+      /* Hidden by default */
+      position: fixed;
+      /* Fixed/sticky position */
+      top: 20px;
+      /* Place the button at the bottom of the page */
+      left: 200px;
+      /* Place the button 30px from the right */
+      z-index: 99;
+      /* Make sure it does not overlap */
+      border: none;
+      /* Remove borders */
+      outline: none;
+      /* Remove outline */
+      background-color: rgb(166, 255, 0);
+      /* Set a background color */
+      color: black;
+      /* Text color */
+      cursor: pointer;
+      /* Add a mouse pointer on hover */
+      padding: 15px;
+      /* Some padding */
+      border-radius: 10px;
+      /* Rounded corners */
+      font-size: 10px;
+      /* Increase font size */
+    }
+
     #toggle-used-cards-button {
       display: block;
       /* Hidden by default */
@@ -338,7 +373,8 @@ return `
       /* Increase font size */
     }
 
-    #toggle-used-cards-button:hover {
+    #toggle-used-cards-button:hover,
+    #toggle-all-points-button:hover {
       background-color: rgb(136,
           209,
           0);
@@ -354,369 +390,395 @@ return `
   <button onclick="askVscodeForUsedCards()" id="updateCards" title="Update Cards">Used Cards</button>
   <button onclick="toggleCardsDisplay()" id="toggle-all-cards-button" title="Show or Hide Cards">Toggle Cards</button>
   <button onclick="toggleAllUsedCardsDisplay()" id="toggle-used-cards-button" title="Show or Hide Cards">Toggle Used
-    Cards</button>
-  ${insertHtml}
+    <button onclick="toggleAddPointButtons()" id="toggle-all-points-button" title="Show or Hide + Buttons">Toggle
+      +</button>
 
-  <script>
-    const goTopButton = document.getElementById("goToTopButton");
-    const goBottomButton = document.getElementById("goBottomButton");
+    ${insertHtml}
 
-    window.onscroll = function () {
-      scrollFunction();
-    };
+    <script>
+      const goTopButton = document.getElementById("goToTopButton");
+      const goBottomButton = document.getElementById("goBottomButton");
 
-    function scrollFunction() {
-      if (
-        document.body.scrollTop > 20 ||
-        document.documentElement.scrollTop > 20
-      ) {
-        goTopButton.style.display = "block";
-      } else {
-        goTopButton.style.display = "none";
-      }
-    }
+      window.onscroll = function () {
+        scrollFunction();
+      };
 
-    function topFunction() {
-      document.body.scrollTop = 0; // For Safari
-      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    }
-    function bottomFunction() {
-      window.scrollTo(0, document.body.scrollHeight);
-    }
-
-    function getAllCciElements() {
-      const allCodes = Array.from(document.querySelectorAll("code"));
-      const allCCIs = allCodes.filter(
-        (code) =>
-          code.innerText.startsWith("{") && code.innerText.endsWith("}")
-      );
-      return allCCIs;
-    }
-
-    function generateCCIButtons() {
-      const allCCIs = getAllCciElements();
-      allCCIs.forEach((cci) => {
-        const cciString = cci.innerText;
-        // copy button
-        const copyButton = document.createElement("button");
-        copyButton.innerText = "Copy";
-        copyButton.onclick = () => {
-          navigator.clipboard.writeText(cciString);
-        };
-
-        cci.parentNode.insertBefore(copyButton, cci);
-        // add to vscode markdown button
-        if (vscode) {
-          const vscodeButton = document.createElement("button");
-          // use vs code blue for the background color of the button
-          vscodeButton.style.backgroundColor = "#007acc";
-          vscodeButton.style.color = "#f8f8f2";
-          vscodeButton.innerText = "Add Card";
-          vscodeButton.onclick = () => {
-            const text = cci.innerText;
-            vscode.postMessage({
-              command: "addCCI",
-              text: cciString,
-            });
-          };
-
-          cci.parentNode.insertBefore(
-            vscodeButton,
-            cci.parentNode.firstChild
-          );
-        }
-
-        // add to vscode latex button
-        if (vscode) {
-          const vscodeButton = document.createElement("button");
-          // use vs code blue for the background color of the button
-          vscodeButton.style.backgroundColor = "#007acc";
-          vscodeButton.style.color = "#f8f8f2";
-          vscodeButton.innerText = "Latex";
-          vscodeButton.onclick = () => {
-            const text = cci.innerText;
-            vscode.postMessage({
-              command: "insertLatex",
-              text: cciString,
-            });
-          };
-
-          cci.parentNode.insertBefore(
-            vscodeButton,
-            cci.parentNode.firstChild
-          );
-        }
-
-        // add open file button
-        if (vscode) {
-          const openFileButton = document.createElement("button");
-          // use vs code blue for the background color of the button
-          openFileButton.innerText = "Open";
-          openFileButton.onclick = () => {
-            const text = cci.innerText;
-            vscode.postMessage({
-              command: "openFile",
-              text: cciString,
-            });
-          };
-
-          cci.parentNode.insertBefore(openFileButton, cci);
-        }
-      });
-
-      console.log(allCCIs);
-    }
-
-    function generatePointButtons() {
-      // get all elements
-      const allPoints = Array.from(
-        document.querySelectorAll(
-          "ul, li, h1, h2, h3, h4, h5, h6, blockquote, code"
-        )
-      );
-
-      // add add to vscode button before the text points.
-      allPoints.forEach((point) => {
-        if (vscode) {
-          let text = point.innerText;
-          const addPointButton = document.createElement("button");
-          // use vs code blue for the background color of the button
-          addPointButton.style.color = "#007acc";
-          addPointButton.style.background = "Transparent";
-          // button no border
-          addPointButton.style.border = "none";
-          addPointButton.style.outline = "none";
-          addPointButton.style.padding = "6px";
-          addPointButton.innerText = "+";
-          addPointButton.onclick = function () {
-            let finalText = text;
-            // need to create a new variable for text. manipulate the text reference directly will change the value of the original elment.
-            if (point.tagName === "UL") {
-              finalText = finalText.split("\\n").join("\\n- ");
-            }
-            // change background color to green
-            point.style.backgroundColor = "lightgreen";
-            // change text color to white
-            vscode.postMessage({
-              command: "addPoint",
-              text: finalText,
-            });
-          };
-
-          // insert button after the element
-          point.parentNode.insertBefore(addPointButton, point);
-        }
-      });
-    }
-
-    function getDocumentCards() {
-      const results = [
-        {
-          id: "88110f81-9ccc-4528-b7e6-a0cf3a42b59b",
-          line: 3,
-          text: "this is the point the card is related to",
-        },
-      ];
-
-      return results;
-    }
-
-    // remove all divs with the class name of 'usedCardDiv';
-    function removeAllUsedCardDivs() {
-      const usedCardDivs = Array.from(
-        document.querySelectorAll(".used-card-div")
-      );
-      usedCardDivs.forEach((div) => {
-        div.remove();
-      });
-
-    }
-    function getUsedCardLabels(cardPlaces) {
-      // create a label element to insert before the current element
-      const allCardPlaceElements = [];
-      cardPlaces.forEach((cardPlace) => {
-        // creating an div to describe where and for what line the card is used.
-        const div = document.createElement("div");
-        div.className = "used-card-div";
-        div.innerText = "Used: [" + cardPlace.line + "] ";
-        div.style.paddingTop = "4px";
-        div.style.marginTop = "4px";
-        div.style.paddingLeft = "8px";
-        div.style.marginBottom = "4px";
-        div.style.paddingBottom = "4px";
-        div.style.backgroundColor = "green";
-        div.style.color = "white";
-        // add a button to jump to the line
-        const jumpToLineButton = document.createElement("button");
-        jumpToLineButton.style.marginLeft = "8px";
-        jumpToLineButton.style.marginRight = "8px";
-        jumpToLineButton.innerText = "Go";
-        // attach a function to the button to post message back to vscode to nativage to the line where the card is used.
-        jumpToLineButton.onclick = () => {
-          vscode.postMessage({
-            command: "jumpToLine",
-            cardPlace: JSON.stringify(cardPlace),
-          });
-        };
-        // add button to element
-        div.appendChild(jumpToLineButton);
-        allCardPlaceElements.push(div);
-      });
-      return allCardPlaceElements;
-    }
-
-    // get all the cards used in the current document. Match the used cards with the elements with same id. If id is matched, mark the card with a different color so the user knows that the card has been used already and can see where it is used in the document and navigate to the line.
-    function markUsedCards(usedCardPlaces) {
-
-      console.log("Checking if cards are used against", usedCardPlaces);
-      const allCciElements = getAllCciElements();
-      allCciElements.forEach((cci) => {
-        const cciString = cci.innerText;
-        const cciObject = JSON.parse(cciString);
-        console.log("Checking cards in the HTML", cciObject);
+      function scrollFunction() {
         if (
-          usedCardPlaces.some((cardPlace) => cardPlace.id === cciObject.id)
+          document.body.scrollTop > 20 ||
+          document.documentElement.scrollTop > 20
         ) {
-          console.log("Found used card", cci);
-          // set its grandparent background back to lightest blue
-          cci.parentNode.parentNode.style.backgroundColor = "#e0f2f1";
-
-          const allUsedPlacesOfTheCard = usedCardPlaces.filter(
-            (cardPlace) => cardPlace.id === cciObject.id
-          );
-          const allUsedCardElements = getUsedCardLabels(
-            allUsedPlacesOfTheCard
-          );
-
-          // insert all the usedCard Elements above the cci element
-          allUsedCardElements.forEach((usedCardElement) => {
-            cci.parentNode.insertBefore(usedCardElement, cci);
-          });
+          goTopButton.style.display = "block";
+        } else {
+          goTopButton.style.display = "none";
         }
-        {
-          {
-            /*  console.log(cciObject);  */
+      }
+
+      function topFunction() {
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+      }
+      function bottomFunction() {
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+
+      function getAllCciElements() {
+        const allCodes = Array.from(document.querySelectorAll("code"));
+        const allCCIs = allCodes.filter(
+          (code) =>
+            code.innerText.startsWith("{") && code.innerText.endsWith("}")
+        );
+        return allCCIs;
+      }
+
+      function generateCCIButtons() {
+        const allCCIs = getAllCciElements();
+        allCCIs.forEach((cci) => {
+          const cciString = cci.innerText;
+          // copy button
+          const copyButton = document.createElement("button");
+          copyButton.innerText = "Copy";
+          copyButton.onclick = () => {
+            navigator.clipboard.writeText(cciString);
+          };
+
+          cci.parentNode.insertBefore(copyButton, cci);
+          // add to vscode markdown button
+          if (vscode) {
+            const vscodeButton = document.createElement("button");
+            // use vs code blue for the background color of the button
+            vscodeButton.style.backgroundColor = "#007acc";
+            vscodeButton.style.color = "#f8f8f2";
+            vscodeButton.innerText = "Add Card";
+            vscodeButton.onclick = () => {
+              const text = cci.innerText;
+              vscode.postMessage({
+                command: "addCCI",
+                text: cciString,
+              });
+            };
+
+            cci.parentNode.insertBefore(
+              vscodeButton,
+              cci.parentNode.firstChild
+            );
           }
-        }
-      });
-    }
 
-    function attachUpdateCardsListener() {
+          // add to vscode latex button
+          if (vscode) {
+            const vscodeButton = document.createElement("button");
+            // use vs code blue for the background color of the button
+            vscodeButton.style.backgroundColor = "#007acc";
+            vscodeButton.style.color = "#f8f8f2";
+            vscodeButton.innerText = "Latex";
+            vscodeButton.onclick = () => {
+              const text = cci.innerText;
+              vscode.postMessage({
+                command: "insertLatex",
+                text: cciString,
+              });
+            };
 
-      window.addEventListener('message', event => {
-        const message = event.data;
+            cci.parentNode.insertBefore(
+              vscodeButton,
+              cci.parentNode.firstChild
+            );
+          }
 
-        switch (message.command) {
-          case "updateUsedCards":
-            console.log("received mark used cards request for", message.text);
+          // add open file button
+          if (vscode) {
+            const openFileButton = document.createElement("button");
+            // use vs code blue for the background color of the button
+            openFileButton.innerText = "Open";
+            openFileButton.onclick = () => {
+              const text = cci.innerText;
+              vscode.postMessage({
+                command: "openFile",
+                text: cciString,
+              });
+            };
 
-            // clear previously added used card divs if any
-            removeAllUsedCardDivs();
+            cci.parentNode.insertBefore(openFileButton, cci);
+          }
+        });
 
-            const usedCardPlaces = JSON.parse(message.text);
-            console.log("parsed used cards objects received by webview", usedCardPlaces);
-            if (usedCardPlaces && Array.isArray(usedCardPlaces) && usedCardPlaces.length > 0) {
-              markUsedCards(usedCardPlaces);
-            }
-            break;
-        }
-      });
-    }
-    // init
-    let vscode =
-      typeof acquireVsCodeApi === "function" ? acquireVsCodeApi() : undefined;
-    let isAllCardsShown = true;
+        console.log(allCCIs);
+      }
 
-    let isUsedCardsShown = true;
+      function generatePointButtons() {
+        // get all elements
+        const allPoints = Array.from(
+          document.querySelectorAll(
+            "ul, li, h1, h2, h3, h4, h5, h6, blockquote, code"
+          )
+        );
 
-    console.log("Checking if this is in vscode", { vscode });
+        // add add to vscode button before the text points.
+        allPoints.forEach((point) => {
+          if (vscode) {
+            let text = point.innerText;
+            const addPointButton = document.createElement("button");
+            // use vs code blue for the background color of the button
+            addPointButton.style.color = "#007acc";
+            addPointButton.style.background = "Transparent";
+            addPointButton.className = "add-point-button hidden";
+            // button no border
+            addPointButton.style.border = "none";
+            addPointButton.style.outline = "none";
+            addPointButton.style.padding = "6px";
+            addPointButton.innerText = "+";
+            addPointButton.onclick = function () {
+              let finalText = text;
+              // need to create a new variable for text. manipulate the text reference directly will change the value of the original elment.
+              if (point.tagName === "UL") {
+                finalText = finalText.split("\\n").join("\\n- ");
+              }
+              // change background color to green
+              point.style.backgroundColor = "lightgreen";
+              // change text color to white
+              vscode.postMessage({
+                command: "addPoint",
+                text: finalText,
+              });
+            };
 
-    generateCCIButtons();
-
-    if (vscode) {
-      generatePointButtons();
-
-      attachUpdateCardsListener();
-
-    }
-    function askVscodeForUsedCards() {
-      if (vscode) {
-        vscode.postMessage({
-          command: "updateUsedCardsInPreview",
+            // insert button after the element
+            point.parentNode.insertBefore(addPointButton, point);
+          }
         });
       }
-    };
-    function hideAllCards() {
-      const allBlockquoteEls = document.querySelectorAll("blockquote");
-      allBlockquoteEls.forEach((el) => {
-        el.classList.add("hidden");
-      });
-      isAllCardsShown = false;
-    }
 
+      function getDocumentCards() {
+        const results = [
+          {
+            id: "88110f81-9ccc-4528-b7e6-a0cf3a42b59b",
+            line: 3,
+            text: "this is the point the card is related to",
+          },
+        ];
 
-
-    function showAllCards() {
-
-      const allBlockquoteEls = document.querySelectorAll("blockquote");
-
-      // add hidden class to all blockquote elements
-      allBlockquoteEls.forEach((el) => {
-        // hide the element by adding className of 'hidden'
-        el.classList.remove("hidden");
-      });
-
-      isAllCardsShown = true;
-    }
-
-    function toggleCardsDisplay() {
-      if (isAllCardsShown) {
-        hideAllCards();
-      } else {
-        showAllCards();
-      }
-    }
-
-    function hideAllUsedCards() {
-      const usedCardDivs = Array.from(
-        document.querySelectorAll(".used-card-div")
-      );
-      console.log("hiding all used cards", usedCardDivs);
-      usedCardDivs.forEach((div) => {
-        div.parentNode.parentNode.classList.add("hidden");
-      });
-      isUsedCardsShown = false;
-    }
-
-    function showAllUsedCards() {
-      const usedCardDivs = Array.from(
-        document.querySelectorAll(".used-card-div")
-      );
-      usedCardDivs.forEach((div) => {
-        div.parentNode.parentNode.parentNode.classList.remove("hidden");
-
-      });
-      isUsedCardsShown = true;
-    }
-
-    function toggleAllUsedCardsDisplay() {
-      // if all cards are hiddle, show used cards directly
-
-      if (isAllCardsShown && isUsedCardsShown) {
-        hideAllUsedCards();
-      } else if (!isAllCardsShown && !isUsedCardsShown) {
-        showAllUsedCards();
-      } else if (isAllCardsShown && !isUsedCardsShown) {
-        hideAllCards();
-        showAllUsedCards();
-      } else if (!isAllCardsShown && isUsedCardsShown) {
-        hideAllCards();
+        return results;
       }
 
+      // remove all divs with the class name of 'usedCardDiv';
+      function removeAllUsedCardDivs() {
+        const usedCardDivs = Array.from(
+          document.querySelectorAll(".used-card-div")
+        );
+        usedCardDivs.forEach((div) => {
+          div.remove();
+        });
 
-    }
+      }
+      function getUsedCardLabels(cardPlaces) {
+        // create a label element to insert before the current element
+        const allCardPlaceElements = [];
+        cardPlaces.forEach((cardPlace) => {
+          // creating an div to describe where and for what line the card is used.
+          const div = document.createElement("div");
+          div.className = "used-card-div";
+          div.innerText = "Used: [" + cardPlace.line + "] ";
+          div.style.paddingTop = "4px";
+          div.style.marginTop = "4px";
+          div.style.paddingLeft = "8px";
+          div.style.marginBottom = "4px";
+          div.style.paddingBottom = "4px";
+          div.style.backgroundColor = "green";
+          div.style.color = "white";
+          // add a button to jump to the line
+          const jumpToLineButton = document.createElement("button");
+          jumpToLineButton.style.marginLeft = "8px";
+          jumpToLineButton.style.marginRight = "8px";
+          jumpToLineButton.innerText = "Go";
+          // attach a function to the button to post message back to vscode to nativage to the line where the card is used.
+          jumpToLineButton.onclick = () => {
+            vscode.postMessage({
+              command: "jumpToLine",
+              cardPlace: JSON.stringify(cardPlace),
+            });
+          };
+          // add button to element
+          div.appendChild(jumpToLineButton);
+          allCardPlaceElements.push(div);
+        });
+        return allCardPlaceElements;
+      }
 
-  </script>
+      // get all the cards used in the current document. Match the used cards with the elements with same id. If id is matched, mark the card with a different color so the user knows that the card has been used already and can see where it is used in the document and navigate to the line.
+      function markUsedCards(usedCardPlaces) {
+
+        console.log("Checking if cards are used against", usedCardPlaces);
+        const allCciElements = getAllCciElements();
+        allCciElements.forEach((cci) => {
+          const cciString = cci.innerText;
+          const cciObject = JSON.parse(cciString);
+          console.log("Checking cards in the HTML", cciObject);
+          if (
+            usedCardPlaces.some((cardPlace) => cardPlace.id === cciObject.id)
+          ) {
+            console.log("Found used card", cci);
+            // set its grandparent background back to lightest blue
+            cci.parentNode.parentNode.style.backgroundColor = "#e0f2f1";
+
+            const allUsedPlacesOfTheCard = usedCardPlaces.filter(
+              (cardPlace) => cardPlace.id === cciObject.id
+            );
+            const allUsedCardElements = getUsedCardLabels(
+              allUsedPlacesOfTheCard
+            );
+
+            // insert all the usedCard Elements above the cci element
+            allUsedCardElements.forEach((usedCardElement) => {
+              cci.parentNode.insertBefore(usedCardElement, cci);
+            });
+          }
+          {
+            {
+              /*  console.log(cciObject);  */
+            }
+          }
+        });
+      }
+
+      function attachUpdateCardsListener() {
+
+        window.addEventListener('message', event => {
+          const message = event.data;
+
+          switch (message.command) {
+            case "updateUsedCards":
+              console.log("received mark used cards request for", message.text);
+
+              // clear previously added used card divs if any
+              removeAllUsedCardDivs();
+
+              const usedCardPlaces = JSON.parse(message.text);
+              console.log("parsed used cards objects received by webview", usedCardPlaces);
+              if (usedCardPlaces && Array.isArray(usedCardPlaces) && usedCardPlaces.length > 0) {
+                markUsedCards(usedCardPlaces);
+              }
+              break;
+          }
+        });
+      }
+      // init
+      let vscode =
+        typeof acquireVsCodeApi === "function" ? acquireVsCodeApi() : undefined;
+      let isAllCardsShown = true;
+
+      let isUsedCardsShown = true;
+
+      console.log("Checking if this is in vscode", { vscode });
+
+      generateCCIButtons();
+
+      if (vscode) {
+        generatePointButtons();
+
+        attachUpdateCardsListener();
+
+      }
+      function askVscodeForUsedCards() {
+        if (vscode) {
+          vscode.postMessage({
+            command: "updateUsedCardsInPreview",
+          });
+        }
+      };
+      function hideAllCards() {
+        const allBlockquoteEls = document.querySelectorAll("blockquote");
+        allBlockquoteEls.forEach((el) => {
+          el.classList.add("hidden");
+        });
+        isAllCardsShown = false;
+      }
+
+
+
+      function showAllCards() {
+
+        const allBlockquoteEls = document.querySelectorAll("blockquote");
+
+        // add hidden class to all blockquote elements
+        allBlockquoteEls.forEach((el) => {
+          // hide the element by adding className of 'hidden'
+          el.classList.remove("hidden");
+        });
+
+        isAllCardsShown = true;
+      }
+
+      function toggleCardsDisplay() {
+        if (isAllCardsShown) {
+          hideAllCards();
+        } else {
+          showAllCards();
+        }
+      }
+
+      function hideAllUsedCards() {
+        const usedCardDivs = Array.from(
+          document.querySelectorAll(".used-card-div")
+        );
+        console.log("hiding all used cards", usedCardDivs);
+        usedCardDivs.forEach((div) => {
+          div.parentNode.parentNode.classList.add("hidden");
+        });
+        isUsedCardsShown = false;
+      }
+
+      function showAllUsedCards() {
+        const usedCardDivs = Array.from(
+          document.querySelectorAll(".used-card-div")
+        );
+        usedCardDivs.forEach((div) => {
+          div.parentNode.parentNode.parentNode.classList.remove("hidden");
+
+        });
+        isUsedCardsShown = true;
+      }
+
+      function toggleAllUsedCardsDisplay() {
+        // if all cards are hiddle, show used cards directly
+
+        if (isAllCardsShown && isUsedCardsShown) {
+          hideAllUsedCards();
+        } else if (!isAllCardsShown && !isUsedCardsShown) {
+          showAllUsedCards();
+        } else if (isAllCardsShown && !isUsedCardsShown) {
+          hideAllCards();
+          showAllUsedCards();
+        } else if (!isAllCardsShown && isUsedCardsShown) {
+          hideAllCards();
+        }
+
+
+      }
+
+      let isAllAddPointButtonsShown = false;
+      function showAllAddPointButtons() {
+        const allAddPointButtons = document.querySelectorAll(".add-point-button");
+        allAddPointButtons.forEach((button) => {
+          button.classList.remove("hidden");
+        });
+        isAllAddPointButtonsShown = true;
+      }
+      function hideAllAddPointButtons() {
+        const allAddPointButtons = document.querySelectorAll(".add-point-button");
+        allAddPointButtons.forEach((button) => {
+          button.classList.add("hidden");
+        });
+        isAllAddPointButtonsShown = false;
+      }
+      function toggleAddPointButtons() {
+        if (isAllAddPointButtonsShown) {
+          hideAllAddPointButtons();
+        } else {
+          showAllAddPointButtons();
+        }
+      }
+
+    </script>
 
 </body>
 
