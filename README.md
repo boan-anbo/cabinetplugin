@@ -2,6 +2,10 @@
 
 This is the REME
 
+## If it can't compile on Mac, use
+
+`vsce package --yarn`vsce package --yarn
+
 ## Features
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
@@ -48,6 +52,7 @@ Fixed issue #.
 Added features X, Y, and Z.
 
 -----------------------------------------------------------------------------------------------------------
+
 ## Following extension guidelines
 
 Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.

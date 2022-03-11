@@ -9,6 +9,9 @@ import { Uri, window, Disposable } from 'vscode';
 import { QuickPickItem } from 'vscode';
 import { workspace } from 'vscode';
 import { openPdfFile } from '../utils/open-source-file';
+import * as fs from 'fs';
+import { getExistingFolders } from '../utils/get-existing-folders';
+import { FileItem } from './file-item';
 
 /**
  * A file opener using window.createQuickPick().
@@ -28,16 +31,6 @@ export async function quickOpen() {
         }
 }
 
-class FileItem implements QuickPickItem {
-
-        label: string;
-        description: string;
-
-        constructor(public base: Uri, public uri: Uri) {
-                this.label = path.basename(uri.fsPath);
-                this.description = path.dirname(path.relative(base.fsPath, uri.fsPath));
-        }
-}
 
 class MessageItem implements QuickPickItem {
 
@@ -61,26 +54,7 @@ async function pickFile() {
                         // load user pdf folders from contribution properties
 
                         input.busy = true;
-                        const pdfFolders = workspace.getConfiguration('cabinetplugin').get('pdfFolders') as string[];
 
-                        console.log(pdfFolders);
-
-                        const allFiles: FileItem[] = []
-                        // collection allFiles in pdfFolders;
-                        // for async loop
-                        for await (const pdfFolder of pdfFolders) {
-                                // get all files in the folder through vscode fs api
-                                const files = await workspace.fs.readDirectory(Uri.file(pdfFolder));
-                                console.log(files);
-                                // return all pdf files
-                                const allFileItems = files
-                                        .filter(file => file[0].endsWith('.pdf'))
-                                        .map(file => new FileItem(
-                                                // absolute path of the pdf folder
-                                                Uri.file(file[0]),
-                                                Uri.joinPath(Uri.file(pdfFolder), file[0])));
-                                allFiles.push(...allFileItems);
-                        }
                         input.busy = false;
 
                         // console.log(`found ${allFiles.length} files under ${pdfFolders}`);
@@ -114,6 +88,7 @@ async function pickFile() {
                                 })
                         );
                         input.show();
+
                 });
         } finally {
                 disposables.forEach(d => d.dispose());

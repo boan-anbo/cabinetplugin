@@ -2,7 +2,7 @@
   "name": "cabinetplugin",
   "displayName": "cabinet-plugin",
   "description": "Cabinet Plugin",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -161,8 +161,28 @@
           "type": "array",
           "title": "PDF Folders to Choose From",
           "default": [
-            "${workspaceRoot}/pdf"
+            "/Users/boan/Dropbox/NEra/New_Core_Reading"
           ]
+        },
+        "cabinetplugin.pdfReaders.windows.executable": {
+          "type": "string",
+          "title": "Reader to open pdf files on Windows",
+          "default": ""
+        },
+        "cabinetplugin.pdfReaders.windows.args": {
+          "type": "array",
+          "title": "Arguments for Reader to open pdf files on Windows",
+          "default": []
+        },
+        "cabinetplugin.pdfReaders.mac.executable": {
+          "type": "string",
+          "title": "Reader to open pdf files on Apple Computers",
+          "default": ""
+        },
+        "cabinetplugin.pdfReaders.mac.argForPage": {
+          "type": "string",
+          "title": "Arguments for Reader to open pdf files on Apple Computers",
+          "default": ""
         }
       }
     }
