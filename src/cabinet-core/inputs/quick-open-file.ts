@@ -12,6 +12,7 @@ import { openPdfFile } from '../utils/open-source-file';
 import * as fs from 'fs';
 import { getExistingFolders } from '../utils/get-existing-folders';
 import { FileItem } from './file-item';
+import { getFilesFromPdfFolders } from '../utils/get-all-pdfs';
 
 /**
  * A file opener using window.createQuickPick().
@@ -55,10 +56,11 @@ async function pickFile() {
 
                         input.busy = true;
 
+                        const allFiles: FileItem[] = await getFilesFromPdfFolders();
+                        input.placeholder = `${allFiles.length} Pdf Files`;
                         input.busy = false;
 
                         // console.log(`found ${allFiles.length} files under ${pdfFolders}`);
-                        input.placeholder = `${allFiles.length} Pdf Files`;
 
 
                         console.log(allFiles);
@@ -78,7 +80,7 @@ async function pickFile() {
                                 input.onDidChangeSelection(items => {
                                         const item = items[0];
                                         if (item instanceof FileItem) {
-                                                resolve(item.uri);
+                                                resolve(Uri.file(item.filePath));
                                                 input.hide();
                                         }
                                 }),
