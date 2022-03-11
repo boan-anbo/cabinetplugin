@@ -19,15 +19,10 @@ export async function fetchFilePagesCardsInput(context: ExtensionContext) {
         const createResourceGroupButton = new MyButton({
                 dark: Uri.file(context.asAbsolutePath('resources/dark/add.svg')),
                 light: Uri.file(context.asAbsolutePath('resources/light/add.svg')),
-        }, 'Create Resource Group');
+        }, 'Choose Cabinet Actions');
 
-        const resourceGroups: QuickPickItem[] = [
-                'vscode-data-function',
-                'vscode-appservice-microservices',
-                'vscode-appservice-monitor',
-                'vscode-appservice-preview',
-
-                'vscode-appservice-prod'
+        const actionGroups: QuickPickItem[] = [
+                'Extract Pdf Pages'
         ]
                 .map(label => ({ label }));
 
@@ -43,19 +38,19 @@ export async function fetchFilePagesCardsInput(context: ExtensionContext) {
 
         async function collectInputs() {
                 const state = {} as Partial<State>;
-                await MultiStepInput.run(input => pickResourceGroup(input, state));
+                await MultiStepInput.run(input => pickAction(input, state));
                 return state as State;
         }
 
-        const title = 'Create Application Service';
+        const title = 'Extract Pdf';
 
-        async function pickResourceGroup(input: MultiStepInput, state: Partial<State>) {
+        async function pickAction(input: MultiStepInput, state: Partial<State>) {
                 const pick = await input.showQuickPick({
                         title,
                         step: 1,
                         totalSteps: 3,
-                        placeholder: 'Pick a resource group',
-                        items: resourceGroups,
+                        placeholder: 'Pick extraction action',
+                        items: actionGroups,
                         activeItem: typeof state.resourceGroup !== 'string' ? state.resourceGroup : undefined,
                         buttons: [createResourceGroupButton],
                         shouldResume: shouldResume
@@ -64,7 +59,7 @@ export async function fetchFilePagesCardsInput(context: ExtensionContext) {
                         return (input: MultiStepInput) => inputResourceGroupName(input, state);
                 }
                 state.resourceGroup = pick;
-                return (input: MultiStepInput) => inputName(input, state);
+                return (input: MultiStepInput) => pickFile(input, state);
         }
 
         async function inputResourceGroupName(input: MultiStepInput, state: Partial<State>) {
@@ -73,14 +68,14 @@ export async function fetchFilePagesCardsInput(context: ExtensionContext) {
                         step: 2,
                         totalSteps: 4,
                         value: typeof state.resourceGroup === 'string' ? state.resourceGroup : '',
-                        prompt: 'Choose a unique name for the resource group',
+                        prompt: 'Pick extraction action',
                         validate: validateNameIsUnique,
                         shouldResume: shouldResume
                 });
-                return (input: MultiStepInput) => inputName(input, state);
+                return (input: MultiStepInput) => pickFile(input, state);
         }
 
-        async function inputName(input: MultiStepInput, state: Partial<State>) {
+        async function pickFile(input: MultiStepInput, state: Partial<State>) {
                 const additionalSteps = typeof state.resourceGroup === 'string' ? 1 : 0;
                 // TODO: Remember current value when navigating back.
                 state.name = await input.showInputBox({
@@ -92,23 +87,23 @@ export async function fetchFilePagesCardsInput(context: ExtensionContext) {
                         validate: validateNameIsUnique,
                         shouldResume: shouldResume
                 });
-                return (input: MultiStepInput) => pickRuntime(input, state);
+                // return (input: MultiStepInput) => pickRuntime(input, state);
         }
 
-        async function pickRuntime(input: MultiStepInput, state: Partial<State>) {
-                const additionalSteps = typeof state.resourceGroup === 'string' ? 1 : 0;
-                const runtimes = await getAvailableRuntimes(state.resourceGroup!, undefined /* TODO: token */);
-                // TODO: Remember currently active item when navigating back.
-                state.runtime = await input.showQuickPick({
-                        title,
-                        step: 3 + additionalSteps,
-                        totalSteps: 3 + additionalSteps,
-                        placeholder: 'Pick a runtime',
-                        items: runtimes,
-                        activeItem: state.runtime,
-                        shouldResume: shouldResume
-                });
-        }
+        // async function pickRuntime(input: MultiStepInput, state: Partial<State>) {
+        //         const additionalSteps = typeof state.resourceGroup === 'string' ? 1 : 0;
+        //         const runtimes = await getAvailableRuntimes(state.resourceGroup!, undefined /* TODO: token */);
+        //         // TODO: Remember currently active item when navigating back.
+        //         state.runtime = await input.showQuickPick({
+        //                 title,
+        //                 step: 3 + additionalSteps,
+        //                 totalSteps: 3 + additionalSteps,
+        //                 placeholder: 'Pick a runtime',
+        //                 items: runtimes,
+        //                 activeItem: state.runtime,
+        //                 shouldResume: shouldResume
+        //         });
+        // }
 
         function shouldResume() {
                 // Could show a notification with the option to resume.
