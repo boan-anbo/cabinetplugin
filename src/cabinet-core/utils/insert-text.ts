@@ -1,7 +1,19 @@
 import { Position } from "vscode";
 import * as vscode from "vscode";
 import { InsertOption } from "../types/insert-option";
+import { Card } from "cabinet-node";
 
+export const insertCardCci = async (cards: Card[], providedOpt?: InsertOption) => {
+    for await (const card of cards) {
+        const opt = providedOpt ?? {
+            linesBefore: 1,
+            linesAfter: 1,
+        } as InsertOption;
+        const cci = card.getCci().toCciMarker();
+        await insertText(cci, opt);
+    }
+    return;
+};
 
 export const insertText = async (text: string, opt?: InsertOption) => {
 
@@ -11,12 +23,6 @@ export const insertText = async (text: string, opt?: InsertOption) => {
     }
 
     const editor = vscode.window.activeTextEditor;
-
-
-
-
-
-
 
     if (editor) {
 

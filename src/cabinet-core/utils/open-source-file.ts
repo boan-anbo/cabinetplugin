@@ -18,9 +18,9 @@ export function openCardSourceFile(cardId: string, useAlternativeFolders: boolea
     if (!card.source?.filePath) {
         return;
     }
-
+    let finalFilePath = card.source.filePath;
     // check if file exists
-    if (!fs.existsSync(card.source.filePath)) {
+    if (!fs.existsSync(finalFilePath)) {
         const allPdfFolders = vscode.workspace.getConfiguration('cabinetplugin').get('pdfFolders') as string[];
         const pdfFolders = getExistingFolders(allPdfFolders);
         const fileName = card.source.fileName ?? path.basename(card.source.filePath);
@@ -28,7 +28,7 @@ export function openCardSourceFile(cardId: string, useAlternativeFolders: boolea
             const folderPath = pdfFolders[index];
             const currentPath = path.join(folderPath, fileName);
             if (fs.existsSync(currentPath)) {
-                openPdfFile(currentPath, card.source.pageIndex);
+                finalFilePath = currentPath;
                 return;
             }
 
@@ -38,33 +38,39 @@ export function openCardSourceFile(cardId: string, useAlternativeFolders: boolea
         vscode.window.showErrorMessage(`File ${card.source.filePath} cannot be found ${useAlternativeFolders ? 'and alternative folders are not available' : ''}}`);
     }
 
-
-
-
-
+    if (fs.existsSync(finalFilePath)) {
+        openPdfFile(finalFilePath, card.source.pageIndex);
+        // tell user
+        vscode.window.showInformationMessage(`File ${finalFilePath} opened`);
+    }
 }
+
 export function openPdfFile(filePath: string, pageNumber?: number) {
 
     let readerExecutable: string | undefined = undefined;
     let readerArgs: string[] = [];
+    let argForPage: string | undefined = undefined;
 
+    const actualPageNumber = pageNumber ? pageNumber + 1 : undefined;
     // switch on os platform
     switch (process.platform) {
         case "win32":
             readerExecutable = vscode.workspace.getConfiguration('cabinetplugin').get('pdfReaders.windows.executable') as string;
-            readerArgs = vscode.workspace.getConfiguration('cabinetplugin').get('pdfReaders.windows.args') as string[];
+            argForPage = vscode.workspace.getConfiguration('cabinetplugin').get('pdfReaders.windows.argForPage') as string;
             readerArgs = [
-                "/A",
-                pageNumber ? "page=" + (pageNumber + 1) : "",
+                argForPage && actualPageNumber ? argForPage + actualPageNumber : "",
             ];
+            // readerArgs = [
+            //     "/A",
+            //     pageNumber ? "page=" + (pageNumber + 1) : "",
+            // ];
             break;
         case "darwin":
             readerExecutable = vscode.workspace.getConfiguration('cabinetplugin').get('pdfReaders.mac.executable') as string;
-            const argForPage = vscode.workspace.getConfiguration('cabinetplugin').get('pdfReaders.mac.argForPage') as string;
-            const actualPageNumber = pageNumber ? pageNumber + 1 : undefined;
+            argForPage = vscode.workspace.getConfiguration('cabinetplugin').get('pdfReaders.mac.argForPage') as string;
             readerArgs = [
                 argForPage && actualPageNumber ? argForPage + actualPageNumber : "",
-            ]
+            ];
             break;
     }
 

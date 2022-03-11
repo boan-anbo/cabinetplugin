@@ -69,6 +69,13 @@
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "cabinetplugin.extractPdfCards",
+        "key": "ctrl+alt+shift+c",
+        "mac": "cmd+c cmd+c"
+      }
+    ],
     "commands": [
       {
         "command": "cabinetplugin.startCabinet",
@@ -76,8 +83,8 @@
         "category": "Cabinet"
       },
       {
-        "command": "cabinetplugin.fetchPageNotes",
-        "title": "Fetch Page Notes",
+        "command": "cabinetplugin.extractPdfCards",
+        "title": "Extract Cards From Pdfs",
         "category": "Cabinet"
       },
       {
@@ -174,6 +181,11 @@
           "title": "Arguments for Reader to open pdf files on Windows",
           "default": []
         },
+        "cabinetplugin.pdfReaders.windows.argForPage": {
+          "type": "string",
+          "title": "Arguments for reader to open pdf at specific page on Windows",
+          "default": ""
+        },
         "cabinetplugin.pdfReaders.mac.executable": {
           "type": "string",
           "title": "Reader to open pdf files on Apple Computers",
@@ -219,6 +231,7 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
+    "axios": "^0.26.1",
     "body-parser": "^1.19.1",
     "cors": "^2.8.5",
     "express": "^4.17.2",
