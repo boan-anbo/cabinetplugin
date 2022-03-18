@@ -14,7 +14,6 @@ export class CopyLatexCodeLensProvider implements vscode.CodeLensProvider {
     public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
 
     constructor() {
-        // this.regex = /(.+)/g;
         this.regex = CabinetCardIdentifier.CCI_PATTERN;
 
         vscode.workspace.onDidChangeConfiguration((_) => {

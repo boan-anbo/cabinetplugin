@@ -1,8 +1,6 @@
 import { CabinetCardIdentifier, Card } from 'cabinet-node';
-import { execFile } from 'child_process';
 import * as vscode from 'vscode';
 import { cabinetNodeInstance } from '../../extension';
-import * as fs from 'fs';
 
 
 /**

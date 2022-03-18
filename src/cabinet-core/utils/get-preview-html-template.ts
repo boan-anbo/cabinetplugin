@@ -1,5 +1,5 @@
 export function getPreviewHtmlTemplate(insertHtml: string, title: string) {
-return `
+  return `
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,378 +9,376 @@ return `
   <title>${title}</title>
 
   <style>
-    h1 {
-      counter-reset: section1;
-    }
+  h1 {
+    counter-reset: section1;
+  }
 
-    h1:before {
-      counter-increment: section1;
-      content: "\\00A7 "counter(section1) " ";
-      font-weight: bold;
-    }
-
-
-    h2:before {
-      counter-increment: section2;
-      content: counter(section1) "."counter(section2) " ";
-    }
-
-    h3:before {
-      counter-increment: section3;
-      content: counter(section1) "."counter(section2) "."counter(section3) " ";
-    }
-
-    h4:before {
-      counter-increment: section4;
-      content: counter(section1) "."counter(section2) "."counter(section3) "."counter(section4) " ";
-    }
-
-    h5:before {
-      counter-increment: section5;
-      content: counter(section1) "."counter(section2) "."counter(section3) "."counter(section4) "."counter(section5);
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    body {
-
-      counter-reset: section1;
-
-      background-color: rgba(255, 255, 255, 0.952);
-      word-break: break-word;
-      max-width: 1027px;
-
-    }
-
-    h1 {
-      background-color: rgb(120, 33, 190);
-      color: white;
-      margin-top: 2em;
-      margin-bottom: 1em;
-      padding-top: 0.2em;
-      padding-bottom: 0.2em;
-      font-size: 2.3em;
-    }
-
-    h2 {
-      text-indent: 0.8em;
-      counter-reset: section2;
-      color: rgb(0, 19, 102);
-      text-decoration: underline;
-      margin-top: 1.5em;
-      margin-bottom: 1em;
-      font-size: 2em;
-    }
-
-    h3 {
-
-      counter-reset: section3;
-      text-indent: 1.6em;
-      color: rgb(0, 26, 143);
-      text-decoration: underline;
-      margin-top: 1.5em;
-      margin-top: 1em;
-      margin-bottom: 0.5em;
-      font-size: 1.6em;
-      line-height: 2em;
-    }
-
-    h4 {
-      counter-reset: section4;
-      text-indent: 2.4em;
-      color: rgb(0, 35, 190);
-      text-decoration: underline;
-      margin-top: 1.5em;
-      font-size: 1.4em;
-    }
-
-    h5 {
-      counter-reset: section5;
-      text-indent: 3.4em;
-      color: rgb(0, 41, 226);
-      text-decoration: underline;
-      margin-top: 1.5em;
-      font-size: 1.2em;
-    }
-
-    p {
-      color: rgb(31, 31, 31);
-    }
-
-    code {
-      color: rgb(0, 81, 92);
-      font-weight: bold;
-      margin-top: 10px;
-      margin-bottom: 10px;
-      line-height: 1.5em;
-    }
-
-    blockquote {
-      border-radius: 30px;
-      padding: 10px;
-      padding-left: 30px;
-      background-color: rgba(215, 238, 188, 0.582);
-    }
-
-    pre {
-      background-color: rgba(255, 255, 255, 0.281);
-      color: rgb(0, 9, 51);
-      overflow-x: auto;
-      white-space: pre-wrap;
-      white-space: -moz-pre-wrap;
-      white-space: -pre-wrap;
-      white-space: -o-pre-wrap;
-      word-wrap: break-word;
-      padding-left: 30px;
-      padding-right: 30px;
-    }
-
-    .table-of-contents {
-      border-radius: 30px;
-      font-size: small;
-      margin: 2em;
-      padding: 0.5em;
-      background-color: rgb(249, 255, 231);
-    }
-
-    .table-of-contents li {
-      margin: 0em;
-      background-color: rgb(249, 255, 231);
-    }
+  h1:before {
+    counter-increment: section1;
+    content: "\\00A7 "counter(section1) " ";
+    font-weight: bold;
+  }
 
 
-    .table-of-contents a:link {
-      color: rgb(11, 80, 170);
-    }
+  h2:before {
+    counter-increment: section2;
+    content: counter(section1) "."counter(section2) " ";
+  }
+
+  h3:before {
+    counter-increment: section3;
+    content: counter(section1) "."counter(section2) "."counter(section3) " ";
+  }
+
+  h4:before {
+    counter-increment: section4;
+    content: counter(section1) "."counter(section2) "."counter(section3) "."counter(section4) " ";
+  }
+
+  h5:before {
+    counter-increment: section5;
+    content: counter(section1) "."counter(section2) "."counter(section3) "."counter(section4) "."counter(section5);
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  body {
+
+    counter-reset: section1;
+
+    background-color: rgba(255, 255, 255, 0.952);
+    word-break: break-word;
+    max-width: 1027px;
+
+    font-size: 0.8em;
+  }
+
+  h1 {
+    background-color: rgb(120, 33, 190);
+    color: white;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    font-size: 1.8em;
+  }
+
+  h2 {
+    text-indent: 1em;
+    counter-reset: section2;
+    color: rgb(0, 19, 102);
+    text-decoration: underline;
+    margin-top: 1em;
+    font-size: 1.6em;
+  }
+
+  h3 {
+
+    counter-reset: section3;
+    text-indent: 1.6em;
+    color: rgb(0, 26, 143);
+    text-decoration: underline;
+    margin-top: 1.em;
+    font-size: 1.4em;
+    line-height: 2em;
+  }
+
+  h4 {
+    counter-reset: section4;
+    text-indent: 2.4em;
+    color: rgb(0, 35, 190);
+    text-decoration: underline;
+    margin-top: 1em;
+    font-size: 1.4em;
+  }
+
+  h5 {
+    counter-reset: section5;
+    text-indent: 3.4em;
+    color: rgb(0, 41, 226);
+    text-decoration: underline;
+    margin-top: 1em;
+    font-size: 1.0em;
+  }
+
+  p {
+    color: rgb(31, 31, 31);
+  }
+
+  code {
+    color: rgb(0, 81, 92);
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    line-height: 1.5em;
+  }
+
+  blockquote {
+    border-radius: 20px;
+    padding: 2px;
+    padding-left: 20px;
+    background-color: rgba(215, 238, 188, 0.582);
+  }
+
+  pre {
+    background-color: rgba(255, 255, 255, 0.281);
+    color: rgb(0, 9, 51);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .table-of-contents {
+    border-radius: 30px;
+    font-size: small;
+    margin: 2em;
+    padding: 0.5em;
+    background-color: rgb(249, 255, 231);
+  }
+
+  .table-of-contents li {
+    margin: 0em;
+    background-color: rgb(249, 255, 231);
+  }
 
 
-    li {
-      color: rgb(0, 90, 30);
-      background-color: rgb(238, 252, 53);
-      font-weight: bolder;
-      font-size: 1em;
-      margin: 5px;
-      line-height: 2em;
-      padding-top: 10px;
-      padding-bottom: 15px;
-      padding-left: 20px;
-      padding-right: 40px;
-      border-radius: 30px;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    #goToTopButton {
-      display: block;
-      /* Hidden by default */
-      position: fixed;
-      /* Fixed/sticky position */
-      top: 20px;
-      /* Place the button at the bottom of the page */
-      right: 30px;
-      /* Place the button 30px from the right */
-      z-index: 99;
-      /* Make sure it does not overlap */
-      border: none;
-      /* Remove borders */
-      outline: none;
-      /* Remove outline */
-      background-color: red;
-      /* Set a background color */
-      color: white;
-      /* Text color */
-      cursor: pointer;
-      /* Add a mouse pointer on hover */
-      padding: 15px;
-      /* Some padding */
-      border-radius: 10px;
-      /* Rounded corners */
-      font-size: 10px;
-      /* Increase font size */
-    }
-
-    #goToTopButton:hover {
-      background-color: #555;
-      /* Add a dark-grey background on hover */
-    }
+  .table-of-contents a:link {
+    color: rgb(11, 80, 170);
+  }
 
 
-    #goBottomButton {
-      display: block;
-      /* Hidden by default */
-      position: fixed;
-      /* Fixed/sticky position */
-      bottom: 20px;
-      /* Place the button at the bottom of the page */
-      right: 30px;
-      /* Place the button 30px from the right */
-      z-index: 99;
-      /* Make sure it does not overlap */
-      border: none;
-      /* Remove borders */
-      outline: none;
-      /* Remove outline */
-      background-color: rgb(0, 89, 255);
-      /* Set a background color */
-      color: white;
-      /* Text color */
-      cursor: pointer;
-      /* Add a mouse pointer on hover */
-      padding: 15px;
-      /* Some padding */
-      border-radius: 10px;
-      /* Rounded corners */
-      font-size: 10px;
-      /* Increase font size */
-    }
+  li {
+    color: rgb(0, 90, 30);
+    background-color: rgb(238, 252, 53);
+    font-weight: bolder;
+    font-size: 1em;
+    margin: 2px;
+    line-height: 2em;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 40px;
+    border-radius: 30px;
+  }
 
-    #goBottomButton:hover {
-      background-color: #555;
-      /* Add a dark-grey background on hover */
-    }
+  button {
+    cursor: pointer;
+  }
 
-    #updateCards {
-      display: block;
-      /* Hidden by default */
-      position: fixed;
-      /* Fixed/sticky position */
-      top: 20px;
-      /* Place the button at the bottom of the page */
-      right: 100px;
-      /* Place the button 30px from the right */
-      z-index: 99;
-      /* Make sure it does not overlap */
-      border: none;
-      /* Remove borders */
-      outline: none;
-      /* Remove outline */
-      background-color: rgb(166, 255, 0);
-      /* Set a background color */
-      color: black;
-      /* Text color */
-      cursor: pointer;
-      /* Add a mouse pointer on hover */
-      padding: 15px;
-      /* Some padding */
-      border-radius: 10px;
-      /* Rounded corners */
-      font-size: 10px;
-      /* Increase font size */
-    }
+  #goToTopButton {
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Fixed/sticky position */
+    top: 20px;
+    /* Place the button at the bottom of the page */
+    right: 30px;
+    /* Place the button 30px from the right */
+    z-index: 99;
+    /* Make sure it does not overlap */
+    border: none;
+    /* Remove borders */
+    outline: none;
+    /* Remove outline */
+    background-color: red;
+    /* Set a background color */
+    color: white;
+    /* Text color */
+    cursor: pointer;
+    /* Add a mouse pointer on hover */
+    padding: 15px;
+    /* Some padding */
+    border-radius: 10px;
+    /* Rounded corners */
+    font-size: 10px;
+    /* Increase font size */
+  }
 
-    #updateCards:hover {
-      background-color: rgb(136,
-          209,
-          0);
-      /* Add a dark-grey background on hover */
-    }
+  #goToTopButton:hover {
+    background-color: #555;
+    /* Add a dark-grey background on hover */
+  }
 
-    #toggle-all-cards-button {
-      display: block;
-      /* Hidden by default */
-      position: fixed;
-      /* Fixed/sticky position */
-      top: 20px;
-      /* Place the button at the bottom of the page */
-      left: 30px;
-      /* Place the button 30px from the right */
-      z-index: 99;
-      /* Make sure it does not overlap */
-      border: none;
-      /* Remove borders */
-      outline: none;
-      /* Remove outline */
-      background-color: rgb(166, 255, 0);
-      /* Set a background color */
-      color: black;
-      /* Text color */
-      cursor: pointer;
-      /* Add a mouse pointer on hover */
-      padding: 15px;
-      /* Some padding */
-      border-radius: 10px;
-      /* Rounded corners */
-      font-size: 10px;
-      /* Increase font size */
-    }
 
-    #toggle-all-cards-button:hover {
-      background-color: rgb(136,
-          209,
-          0);
-      /* Add a dark-grey background on hover */
-    }
+  #goBottomButton {
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Fixed/sticky position */
+    bottom: 20px;
+    /* Place the button at the bottom of the page */
+    right: 30px;
+    /* Place the button 30px from the right */
+    z-index: 99;
+    /* Make sure it does not overlap */
+    border: none;
+    /* Remove borders */
+    outline: none;
+    /* Remove outline */
+    background-color: rgb(0, 89, 255);
+    /* Set a background color */
+    color: white;
+    /* Text color */
+    cursor: pointer;
+    /* Add a mouse pointer on hover */
+    padding: 15px;
+    /* Some padding */
+    border-radius: 10px;
+    /* Rounded corners */
+    font-size: 10px;
+    /* Increase font size */
+  }
 
-    #toggle-all-points-button {
-      display: block;
-      /* Hidden by default */
-      position: fixed;
-      /* Fixed/sticky position */
-      top: 20px;
-      /* Place the button at the bottom of the page */
-      left: 200px;
-      /* Place the button 30px from the right */
-      z-index: 99;
-      /* Make sure it does not overlap */
-      border: none;
-      /* Remove borders */
-      outline: none;
-      /* Remove outline */
-      background-color: rgb(166, 255, 0);
-      /* Set a background color */
-      color: black;
-      /* Text color */
-      cursor: pointer;
-      /* Add a mouse pointer on hover */
-      padding: 15px;
-      /* Some padding */
-      border-radius: 10px;
-      /* Rounded corners */
-      font-size: 10px;
-      /* Increase font size */
-    }
+  #goBottomButton:hover {
+    background-color: #555;
+    /* Add a dark-grey background on hover */
+  }
 
-    #toggle-used-cards-button {
-      display: block;
-      /* Hidden by default */
-      position: fixed;
-      /* Fixed/sticky position */
-      top: 20px;
-      /* Place the button at the bottom of the page */
-      left: 130px;
-      /* Place the button 30px from the right */
-      z-index: 99;
-      /* Make sure it does not overlap */
-      border: none;
-      /* Remove borders */
-      outline: none;
-      /* Remove outline */
-      background-color: rgb(166, 255, 0);
-      /* Set a background color */
-      color: black;
-      /* Text color */
-      cursor: pointer;
-      /* Add a mouse pointer on hover */
-      padding: 15px;
-      /* Some padding */
-      border-radius: 10px;
-      /* Rounded corners */
-      font-size: 10px;
-      /* Increase font size */
-    }
+  #updateCards {
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Fixed/sticky position */
+    top: 20px;
+    /* Place the button at the bottom of the page */
+    right: 100px;
+    /* Place the button 30px from the right */
+    z-index: 99;
+    /* Make sure it does not overlap */
+    border: none;
+    /* Remove borders */
+    outline: none;
+    /* Remove outline */
+    background-color: rgb(166, 255, 0);
+    /* Set a background color */
+    color: black;
+    /* Text color */
+    cursor: pointer;
+    /* Add a mouse pointer on hover */
+    padding: 15px;
+    /* Some padding */
+    border-radius: 10px;
+    /* Rounded corners */
+    font-size: 10px;
+    /* Increase font size */
+  }
 
-    #toggle-used-cards-button:hover,
-    #toggle-all-points-button:hover {
-      background-color: rgb(136,
-          209,
-          0);
-      /* Add a dark-grey background on hover */
-    }
-  </style>
+  #updateCards:hover {
+    background-color: rgb(136,
+        209,
+        0);
+    /* Add a dark-grey background on hover */
+  }
+
+  #toggle-all-cards-button {
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Fixed/sticky position */
+    top: 20px;
+    /* Place the button at the bottom of the page */
+    left: 30px;
+    /* Place the button 30px from the right */
+    z-index: 99;
+    /* Make sure it does not overlap */
+    border: none;
+    /* Remove borders */
+    outline: none;
+    /* Remove outline */
+    background-color: rgb(166, 255, 0);
+    /* Set a background color */
+    color: black;
+    /* Text color */
+    cursor: pointer;
+    /* Add a mouse pointer on hover */
+    padding: 15px;
+    /* Some padding */
+    border-radius: 10px;
+    /* Rounded corners */
+    font-size: 10px;
+    /* Increase font size */
+  }
+
+  #toggle-all-cards-button:hover {
+    background-color: rgb(136,
+        209,
+        0);
+    /* Add a dark-grey background on hover */
+  }
+
+  #toggle-all-points-button {
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Fixed/sticky position */
+    top: 20px;
+    /* Place the button at the bottom of the page */
+    left: 200px;
+    /* Place the button 30px from the right */
+    z-index: 99;
+    /* Make sure it does not overlap */
+    border: none;
+    /* Remove borders */
+    outline: none;
+    /* Remove outline */
+    background-color: rgb(166, 255, 0);
+    /* Set a background color */
+    color: black;
+    /* Text color */
+    cursor: pointer;
+    /* Add a mouse pointer on hover */
+    padding: 15px;
+    /* Some padding */
+    border-radius: 10px;
+    /* Rounded corners */
+    font-size: 10px;
+    /* Increase font size */
+  }
+
+  #toggle-used-cards-button {
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Fixed/sticky position */
+    top: 20px;
+    /* Place the button at the bottom of the page */
+    left: 130px;
+    /* Place the button 30px from the right */
+    z-index: 99;
+    /* Make sure it does not overlap */
+    border: none;
+    /* Remove borders */
+    outline: none;
+    /* Remove outline */
+    background-color: rgb(166, 255, 0);
+    /* Set a background color */
+    color: black;
+    /* Text color */
+    cursor: pointer;
+    /* Add a mouse pointer on hover */
+    padding: 15px;
+    /* Some padding */
+    border-radius: 10px;
+    /* Rounded corners */
+    font-size: 10px;
+    /* Increase font size */
+  }
+
+  #toggle-used-cards-button:hover,
+  #toggle-all-points-button:hover {
+    background-color: rgb(136,
+        209,
+        0);
+    /* Add a dark-grey background on hover */
+  }
+</style>
 </head>
 
 <body>

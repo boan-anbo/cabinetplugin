@@ -57,13 +57,14 @@ export function openPdfFile(filePath: string, pageNumber?: number) {
         case "win32":
             readerExecutable = vscode.workspace.getConfiguration('cabinetplugin').get('pdfReaders.windows.executable') as string;
             argForPage = vscode.workspace.getConfiguration('cabinetplugin').get('pdfReaders.windows.argForPage') as string;
-            readerArgs = [
-                argForPage && actualPageNumber ? argForPage + actualPageNumber : "",
-            ];
             // readerArgs = [
-            //     "/A",
-            //     pageNumber ? "page=" + (pageNumber + 1) : "",
+            //     argForPage && actualPageNumber ? argForPage + actualPageNumber : "",
             // ];
+            // todo fix the temporary fix
+            readerArgs = [
+                "/A",
+                pageNumber ? "page=" + (pageNumber + 1) : "",
+            ];
             break;
         case "darwin":
             readerExecutable = vscode.workspace.getConfiguration('cabinetplugin').get('pdfReaders.mac.executable') as string;

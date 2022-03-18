@@ -24,8 +24,11 @@ import { copyLatexCodeLensProvider, copyLatexCommand } from './cabinet-core/code
 import { updateDefaultSettings } from './cabinet-core/utils/update-default-setting';
 import { openCardSourceFile } from './cabinet-core/utils/open-source-file';
 import { ExtensionContext } from 'vscode';
-import { extractPdfCards as extractPdfCards } from './cabinet-core/inputs/extract-pdf-cards';
-import { quickOpen } from './cabinet-core/inputs/quick-open-file';
+import { extractPdfCards as extractPdfCards } from './cabinet-core/quickactions/extract-pdf-cards';
+import { quickOpen } from './cabinet-core/quickactions/quick-open-file';
+import { cabinetInstanceActions as cabinetActions } from './cabinet-core/quickactions/cabinet-actions';
+import { testDisserator } from './cabinet-core/disserator/test-disserator';
+import { disseratorActions } from './cabinet-core/quickactions/disserator-quickactions/disserator-actions';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -165,9 +168,19 @@ export async function activate(context: vscode.ExtensionContext) {
 			});
 			context.subscriptions.push(outlineRefreshListener);
 
-			// register quickinputs
+			// register extract pdf actions
 			context.subscriptions.push(vscode.commands.registerCommand('cabinetplugin.extractPdfCards', async () => {
 				extractPdfCards(context);
+			}));
+
+			// register markdown points actions actions
+			context.subscriptions.push(vscode.commands.registerCommand('cabinetplugin.disseratorActions', async () => {
+				disseratorActions(context);
+			}));
+
+			// register cabinet actions
+			context.subscriptions.push(vscode.commands.registerCommand('cabinetplugin.cabinetActions', async () => {
+				cabinetActions(context);
 				// const options: { [key: string]: (context: ExtensionContext) => Promise<void> } = {
 				// 	"Fetch Cards on File Pages": fetchFilePagesCardsInput,
 				// 	"Pick File": quickOpen
@@ -185,6 +198,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			}));
 
 			// register codelens providers.
+			context.subscriptions.push(vscode.commands.registerCommand('cabinetplugin.testDisserator', testDisserator));
 
 			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.clickCardTitle", clickCardTitleCommand));
 
@@ -246,6 +260,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	});
 	// context.subscriptions.push(startCabinet);
+
 
 }
 
