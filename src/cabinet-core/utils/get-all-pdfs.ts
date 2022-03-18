@@ -1,7 +1,8 @@
 import path = require("path");
 import { FileType, Uri, workspace } from "vscode";
-import { FileItem } from "../inputs/file-item";
+import { FileItem } from "../quickactions/file-item";
 import { getExistingFolders } from "./get-existing-folders";
+import * as fs from "fs";
 
 
 
@@ -27,16 +28,33 @@ export const getFilesFromPdfFolders = async (): Promise<FileItem[]> => {
                                 const fileName = file[0];
                                 const fullPath = path.join(pdfFolder, fileName);
                                 const fileType = file[1];
+                                const fileStat = fs.statSync(fullPath);
                                 return new FileItem(
                                         fileName,
                                         fullPath,
                                         pdfFolder,
-                                        fileType
+                                        fileType,
+                                        fileStat
                                 );
                         });
                 allFiles.push(...allFileItems);
         }
         return allFiles;
+}
+
+// get all files from pdfFolders and sort by modified date
+export const getSortedFilesFromPdfFoldersByModifiedDates = async (): Promise<FileItem[]> => {
+
+        const allFiles = await getFilesFromPdfFolders();
+
+        const sortedFiles = allFiles.sort((a, b) => {
+                if (a.fileStat && b.fileStat) {
+                        return b.fileStat.mtime.getTime() - a.fileStat.mtime.getTime();
+                }
+                return 0;
+        });
+
+        return sortedFiles;
 }
 
 

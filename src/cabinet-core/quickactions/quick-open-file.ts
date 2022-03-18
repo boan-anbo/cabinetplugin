@@ -12,7 +12,7 @@ import { openPdfFile } from '../utils/open-source-file';
 import * as fs from 'fs';
 import { getExistingFolders } from '../utils/get-existing-folders';
 import { FileItem } from './file-item';
-import { getFilesFromPdfFolders } from '../utils/get-all-pdfs';
+import { getFilesFromPdfFolders, getSortedFilesFromPdfFoldersByModifiedDates as getSortedFilesFromPdfFoldersByModifiedDate } from '../utils/get-all-pdfs';
 
 /**
  * A file opener using window.createQuickPick().
@@ -56,7 +56,7 @@ async function pickFile() {
 
                         input.busy = true;
 
-                        const allFiles: FileItem[] = await getFilesFromPdfFolders();
+                        const allFiles: FileItem[] = await getSortedFilesFromPdfFoldersByModifiedDate();
                         input.placeholder = `${allFiles.length} Pdf Files`;
                         input.busy = false;
 

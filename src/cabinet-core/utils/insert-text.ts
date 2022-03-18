@@ -15,7 +15,7 @@ export const insertCardCci = async (cards: Card[], providedOpt?: InsertOption) =
     return;
 };
 
-export const insertText = async (text: string, opt?: InsertOption) => {
+export const insertText = async (text: string, opt?: InsertOption, line?: number) => {
 
     if (!vscode.window.activeTextEditor && opt?.focusFirstEditorGroup) {
 
@@ -44,7 +44,8 @@ export const insertText = async (text: string, opt?: InsertOption) => {
             if (opt?.select) {
                 textEditorEdit.replace(editor.selection, text);
             } else {
-                textEditorEdit.insert(new Position(editor.selection.active.line, editor.selection.active.character), text);
+                const lineToInsert = line ?? editor.selection.active.line;
+                textEditorEdit.insert(new Position(lineToInsert, editor.selection.active.character), text);
             }
 
         });
@@ -57,3 +58,4 @@ export const insertText = async (text: string, opt?: InsertOption) => {
     }
 
 }
+
