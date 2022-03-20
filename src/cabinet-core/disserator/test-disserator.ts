@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { cabinetNodeInstance } from '../../extension';
 import { Disserator } from './disserator';
+import { InsertCardOptions } from './types/insert-card-options';
 
 export function testDisserator() {
 
@@ -23,6 +24,6 @@ export function testDisserator() {
     const firstCard = cabinetNodeInstance.cards[0];
     disserator.insertCards(firstPoint, [
         firstCard
-    ], {});
+    ], {} as InsertCardOptions);
 
 }
