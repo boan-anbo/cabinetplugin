@@ -1,6 +1,6 @@
 import { MarkdownPoint } from "./markdown-point";
 
-export interface InsertCardOptions = {
+export interface InsertCardOptions {
 
     markdownPoint: MarkdownPoint;
     insertToTop: boolean;
