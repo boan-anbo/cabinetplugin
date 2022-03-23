@@ -29,6 +29,7 @@ import { quickOpen } from './cabinet-core/quickactions/quick-open-file';
 import { cabinetInstanceActions as cabinetActions } from './cabinet-core/quickactions/cabinet-actions';
 import { testDisserator } from './cabinet-core/disserator/test-disserator';
 import { disseratorActions } from './cabinet-core/quickactions/disserator-quickactions/disserator-actions';
+import { registerWritingPlan } from './writing-plan/register-writing-plan';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -98,6 +99,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	// I'm not pushing it into subscriptions otherwise it will be disposed when Cabinet is turned off.
 	registerStatusBar();
 
+
+	registerWritingPlan(context);
 
 	// vscode.window.registerTreeDataProvider(
 	// 	'cabinetCards',
@@ -253,6 +256,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage(`Started: ${cardCount} cards loaded from ${cabinetJsonFile}.`);
 
 			updateCurrentCards();
+
 
 			disposables = context.subscriptions;
 

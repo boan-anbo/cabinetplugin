@@ -24,10 +24,21 @@
           "id": "cabinetContainer",
           "title": "Cabinet",
           "icon": "resources/light/refresh.svg"
+        },
+        {
+          "id": "writing-plan",
+          "title": "Writing Plan",
+          "icon": "media/writing-plan.svg"
         }
       ]
     },
     "views": {
+      "writing-plan": [
+        {
+          "id": "writing-outline",
+          "name": "Writing Plan Outline"
+        }
+      ],
       "cabinetContainer": [
         {
           "id": "nodeDependencies",
@@ -43,6 +54,16 @@
       ]
     },
     "menus": {
+      "view/item/context": [
+        {
+          "command": "writing-plan.outline.moveSectionUp",
+          "group": "inline"
+        },
+        {
+          "command": "writing-plan.outline.moveSectionDown",
+          "group": "inline"
+        }
+      ],
       "view/title": [
         {
           "command": "cabinetOutline.refresh",
@@ -168,11 +189,38 @@
         "title": "Disable Codelens",
         "command": "cabinetplugin.disableCodeLens",
         "category": "Cabinet"
+      },
+      {
+        "command": "writing-plan.outline.moveSectionDown",
+        "title": "Move Section Down",
+        "category": "writing-plan",
+        "icon": {
+          "light": "media/section-down.svg",
+          "dark": "media/section-down.svg"
+        }
+      },
+      {
+        "command": "writing-plan.outline.moveSectionUp",
+        "title": "Move Section Up",
+        "category": "writing-plan",
+        "icon": {
+          "light": "media/section-up.svg",
+          "dark": "media/section-up.svg"
+        }
+      },
+      {
+        "command": "cabinetplugin.writing-plan.outline.refresh",
+        "title": "Refresh Outline",
+        "category": "Writing Plan"
       }
     ],
     "configuration": {
       "title": "Cabinet",
       "properties": {
+        "cabinetplugin.writing-plan.enableCodeLens": {
+          "type": "boolean",
+          "default": true
+        },
         "cabinetplugin.enableCodeLens": {
           "type": "boolean",
           "default": true
@@ -232,7 +280,7 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "recompile": "npm i && npm link cabinet-node && npm run compile",
+    "recompile": "npm i && npm link cabinet-node writing-plan && npm run compile",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
