@@ -9,6 +9,7 @@ import { createStatusBar } from './writing-plan-bar';
 import { goToLine } from './go-to-line';
 import { cursorChangeHighlightListener } from './cursor-change-listener';
 import { TestViewDragAndDrop } from './test-tree-view-drag-and-drop';
+import { registerSectionDecorations } from './decorators/section-annotator';
 
 export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 
@@ -35,6 +36,9 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 	// register actions for writing plan outline items
 	vscode.commands.registerCommand('writing-plan.outline.moveSectionUp', treeview.moveSectionUp);
 	vscode.commands.registerCommand('writing-plan.outline.moveSectionDown', treeview.moveSectionDown);
+
+	// register section decorators
+	registerSectionDecorations(context);
 
 	console.log('Writing Plan Inititated');
 }
