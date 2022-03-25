@@ -30,6 +30,10 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
             const regex = new RegExp(this.regex);
             const text = document.getText();
             let matches;
+            const plan = getCurrentPlan();
+            if (!plan) {
+                return [];
+            }
             while ((matches = regex.exec(text)) !== null) {
                 const line = document.lineAt(document.positionAt(matches.index).line);
                 const indexOf = line.text.indexOf(matches[0]);
@@ -45,7 +49,7 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
 
                     // get text at range
                     const marker = document.getText(range);
-                    const isCloseMarker = getCurrentPlan().isCloseMarker(marker);
+                    const isCloseMarker = plan.isCloseMarker(marker);
 
                     // section header = 
                     // generate header with #

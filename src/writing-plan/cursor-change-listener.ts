@@ -1,6 +1,6 @@
 import { TextEditorSelectionChangeEvent } from "vscode";
 import { getWrappingSectionByCursorPosition } from "./go-to-section-ends";
-import { clearHighlightLines, highlightLines } from "./line-highlighter";
+import { clearHighlightLines, highlightLines } from "./decorators/line-highlighter";
 
 export const cursorChangeHighlightListener = (e: TextEditorSelectionChangeEvent) => {
     // if the cursor is in a section, update the status bar with the section title
