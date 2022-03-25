@@ -7,14 +7,14 @@ export const highlightLines = (beginLine: number, beginIndex: number, endLine: n
         const range = new Range(new Position(beginLine, beginIndex), new Position(endLine, endIndex));
 
         currentHighlight = window.createTextEditorDecorationType({
-            backgroundColor: 'rgba(251, 255, 225, 0.8)'
+            backgroundColor: 'rgba(251, 255, 225, 0.8)',
         }), [range];
         // set the current highlight
         activeEditor.setDecorations(currentHighlight, [range]);
     }
-}
+};
 
 export const clearHighlightLines = () => {
     // clear the highlight text editor decoration
     currentHighlight?.dispose();
-}
+};

@@ -149,6 +149,6 @@ const getRootSectionItems = (): WritingPlanTreeItem[] => {
     if (currentPlan === null) {
         return [];
     }
-    const sections = currentPlan.sections.filter(section => section.parentId === null);
-    return SectionTreeItem.fromSections(sections);
+    // I need to convert all sections to section items first so that I can calculate cards among them, such as adding children section's cards to parent sections. And then filter out the children. This might be expensive, and could be optimized later.
+    return SectionTreeItem.fromSections(currentPlan.sections).filter(sectionItem => sectionItem.section.parentId === null);
 };

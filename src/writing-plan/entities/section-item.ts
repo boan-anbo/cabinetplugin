@@ -19,9 +19,10 @@ export class SectionTreeItem extends WritingPlanTreeItem {
     hasCards: boolean;
     cardsNum: number;
 
-    constructor(
+    private constructor(
         section: Section,
-        collapse?: TreeItemCollapsibleState
+        collapse?: TreeItemCollapsibleState,
+        childrenCardsNum?: number,
     ) {
 
         super(
@@ -37,13 +38,8 @@ export class SectionTreeItem extends WritingPlanTreeItem {
             }
         }
 
-        const titleLabel = section.title ?? section.marker;
-        const cardsLabel = `[${cardItems.length}]`;
-        const orderLabel = `${section.levelOrder + 1}`;
         // store card items under section items
         this.cardItems = cardItems;
-
-        super.label = `${orderLabel} ${cardsLabel} ${titleLabel} `;
 
 
         this.section = section;
@@ -59,7 +55,7 @@ export class SectionTreeItem extends WritingPlanTreeItem {
 
         // set cards info
         this.hasCards = this.cardItems.length > 0;
-        this.cardsNum = this.cardItems.length;
+        this.cardsNum = this.cardItems.length + (childrenCardsNum ?? 0);
         // jump to the line as command
         this.command = {
             title: 'Jump to section',
@@ -70,18 +66,38 @@ export class SectionTreeItem extends WritingPlanTreeItem {
         };
     }
 
+    updateLabel() {
+        const titleLabel = this.section.title ?? this.section.marker;
+        const cardsLabel = `[${this.cardsNum}]`;
+        const orderLabel = `${this.section.levelOrder + 1}`;
+        super.label = `${orderLabel} ${cardsLabel} ${titleLabel} `;
+
+    }
+
     iconPath = {
         light: path.join(__filename, '..', '..', 'media', 'section-item.svg'),
         dark: path.join(__filename, '..', '..', 'media', 'section-item.svg'),
 
     };
 
-    static fromSections(sections: Section[]): SectionTreeItem[] {
-        return sections.map(section => new SectionTreeItem(section));
+    static fromSections(sections: Section[],): SectionTreeItem[] {
+        let allSectionItems = sections.map(section => new SectionTreeItem(section));
+
+        allSectionItems.forEach(sectionItem => {
+            if (sectionItem.section.parentId !== null) {
+                const parentSection = allSectionItems.find(item => item.section.id === sectionItem.section.parentId);
+                if (parentSection) {
+                    parentSection.cardsNum += sectionItem.cardsNum;
+                }
+            }
+
+        });
+        return allSectionItems.map(sectionItem => { sectionItem.updateLabel(); return sectionItem });
+
     }
 
-    static fromSection(section: Section): SectionTreeItem {
-        return new SectionTreeItem(section);
+    static fromSection(section: Section, collapse?: TreeItemCollapsibleState, childrenCardsNum?: number): SectionTreeItem {
+        return new SectionTreeItem(section, collapse, childrenCardsNum);
     }
 
 }

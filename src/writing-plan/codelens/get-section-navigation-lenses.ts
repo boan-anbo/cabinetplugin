@@ -7,6 +7,10 @@ export const getNavigationCodeLenses = (range: Range, section: Section): CodeLen
     const lenses: CodeLens[] = [];
     const plan = getCurrentPlan();
 
+    if (!plan) {
+        return [];
+    }
+
 
     const currentSectionId = section.id;
     const parentSection = plan.getParentSection(currentSectionId);

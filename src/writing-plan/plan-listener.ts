@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { WritingPlan } from 'writing-plan';
-import { updateStatusBarText } from './writing-plan-bar';
+import { updateStatusBarText as updatePlanStatusBarText } from './writing-plan-bar';
 import { getCurrentPlan, refreshCurrentPlan, writingPlans } from './writing-plan-instance';
 
 let changeTimeout: NodeJS.Timeout | null;
@@ -32,7 +32,7 @@ export const documentPlanListener = (event: vscode.TextDocumentChangeEvent) => {
                 // run vscode command 
                 await vscode.commands.executeCommand('writing-plan.outline.refresh');
                 console.log("checked", getCurrentPlan());
-                updateStatusBarText(writingPlans[0].toString());
+                updatePlanStatusBarText();
             }
         }
     }, 200);

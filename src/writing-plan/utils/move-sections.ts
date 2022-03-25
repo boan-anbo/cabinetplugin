@@ -23,7 +23,7 @@ export class MovePosition {
 
 export const moveSections = async (sectionMoved: Section, sectionToMoveTo: Section, insertRelation: InsertRelation) => {
     const beginPosition = new MovePosition(sectionMoved.markerOpenLine, sectionMoved.markerOpenIndex);
-    const endPosition = new MovePosition(sectionMoved.markerCloseLine, sectionMoved.markerCloseIndex + sectionMoved.markerCloseLength);
+    const endPosition = new MovePosition(sectionMoved.markerCloseLine, sectionMoved.markerCloseEndIndex + 1);
     let insertPosition;
     switch (insertRelation) {
 
@@ -36,14 +36,11 @@ export const moveSections = async (sectionMoved: Section, sectionToMoveTo: Secti
         case InsertRelation.After:
             insertPosition = new MovePosition(
                 sectionToMoveTo.markerCloseLine,
-                sectionToMoveTo.markerCloseIndex + sectionToMoveTo.markerCloseLength + 1
+                sectionToMoveTo.markerCloseEndIndex + 1
             );
             break;
-
     }
-
     if (insertPosition) {
-
         await movePassages(beginPosition, endPosition, insertPosition);
     }
 };
@@ -56,6 +53,7 @@ export const movePassages = async (beginPosition: MovePosition, endPosition: Mov
             new vscode.Position(beginPosition.line, beginPosition.index),
             new vscode.Position(endPosition.line, endPosition.index)
         );
+
         const cutText = `${editor.document.getText(cutRange)}`;
 
         await editor.edit((textEditorEdit) => {
