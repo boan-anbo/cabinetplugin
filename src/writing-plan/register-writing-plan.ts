@@ -8,13 +8,11 @@ import { documentPlanListener } from './plan-listener';
 import { createStatusBar } from './writing-plan-bar';
 import { goToLine } from './go-to-line';
 import { cursorChangeHighlightListener } from './cursor-change-listener';
-import { TestViewDragAndDrop } from './test-tree-view-drag-and-drop';
+import { TestViewDragAndDrop } from './tree-view-drag-and-drop';
 import { registerSectionDecorations } from './decorators/section-annotator';
+import { registerCursorDecorations } from './decorators/cursor-annotator';
 
 export const registerWritingPlan = (context: vscode.ExtensionContext) => {
-
-	// const planNodeProvider = new PlanNodeProvider();
-	// vscode.window.registerTreeDataProvider('writing-outline', planNodeProvider);
 
 	const goToLineCommandSub = vscode.commands.registerCommand("cabinetplugin.writing-plan.goToLine", goToLine);
 	context.subscriptions.push(goToLineCommandSub);
@@ -39,6 +37,8 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 
 	// register section decorators
 	registerSectionDecorations(context);
+	// registor cursor decorators
+	registerCursorDecorations(context);
 
 	console.log('Writing Plan Inititated');
-}
+};

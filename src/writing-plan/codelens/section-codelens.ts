@@ -53,12 +53,12 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
 
                     // section header = 
                     // generate header with #
-                    const header = Array.from({ length: section.level + 1 }, (x, i) => i).map(i => '#').join('');
-                    this.codeLenses.push(new vscode.CodeLens(range, {
-                        title: `${isCloseMarker ? '<' : '>'} ${header} [${section.order + 1}]`,
-                        tooltip: '',
-                        command: '',
-                    }));
+                    // const header = Array.from({ length: section.level + 1 }, (x, i) => i).map(i => '#').join('');
+                    // this.codeLenses.push(new vscode.CodeLens(range, {
+                    //     title: `${isCloseMarker ? '<' : '>'} ${header} [${section.order + 1}]`,
+                    //     tooltip: '',
+                    //     command: '',
+                    // }));
 
 
                     // give navigation buttons only to open markers to lessen visual pollution. The close marker can be used to jump to the beginning to use the navigation buttons
@@ -66,9 +66,7 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
                         const navigationLenses = getNavigationCodeLenses(range, section);
                         this.codeLenses.push(...navigationLenses);
                     }
-
-
-                    this.codeLenses.push(new vscode.CodeLens(range));
+                    // this.codeLenses.push(new vscode.CodeLens(range));
                 }
             }
             return this.codeLenses;
@@ -81,18 +79,20 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
 
         const section = getSectionByRange(codeLens.range);
 
-        if (editor && section) {
-            const title = `T: ${section?.wordTarget} | C: ${section?.wordCount} | B: ${section.wordBalance}${section?.title ? (' | ' + section.title) : ''} `;
-            codeLens.command = {
-                title,
-                tooltip: `Jump to Section Beginning: ${section.title ?? section.marker}`,
-                command: 'writing-plan.goToLine',
-                arguments: [
-                    section?.markerOpenLine,
-                ]
-            };
-            return codeLens;
-        }
+        // this is taken over by annotator
+        // if (editor && section) {
+        //     const title = `T: ${section?.wordTarget} | C: ${section?.wordCount} | B: ${section.wordBalance}${section?.title ? (' | ' + section.title) : ''} `;
+        //     codeLens.command = {
+        //         title,
+        //         tooltip: `Jump to Section Beginning: ${section.title ?? section.marker}`,
+        //         command: 'writing-plan.goToLine',
+        //         arguments: [
+        //             section?.markerOpenLine,
+        //         ]
+        //     };
+        //     return codeLens;
+        // }
+        return codeLens;
 
         return null;
     }

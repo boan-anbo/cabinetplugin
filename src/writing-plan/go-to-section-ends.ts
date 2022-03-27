@@ -18,9 +18,17 @@ export const jumpToCursorSectionBeginning = async () => {
     await goToLine(sectionIn.markerOpenLine, sectionIn.markerOpenIndex + sectionIn.markerOpenLength);
 };
 
-export const getWrappingSectionByCursorPosition = (cursor: vscode.Position): Section | null => {
+export const getWrappingSectionByCursorPosition = (cursor: vscode.Position, excludingMarkers: boolean = false): Section | null => {
     const cursorLine = cursor.line;
     const cursorIndex = cursor.character;
     const sectionIn = getCurrentPlan()?.getSectionByLineAndIndex(cursorLine, cursorIndex);
+    if (sectionIn && excludingMarkers) {
+        if (sectionIn.markerOpenLine === cursorLine && cursorIndex >= sectionIn.markerOpenIndex && cursorIndex <= sectionIn.markerOpenEndIndex) {
+            return null;
+        }
+        if (sectionIn.markerCloseLine === cursorLine && cursorIndex >= sectionIn.markerCloseIndex && cursorIndex <= sectionIn.markerCloseEndIndex) {
+            return null;
+        }
+    }
     return sectionIn ?? null;
 };

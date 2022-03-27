@@ -102,6 +102,11 @@
         "mac": "cmd+c cmd+c"
       },
       {
+        "command": "cabinetplugin.zoteroActions",
+        "key": "ctrl+alt+shift+z",
+        "mac": "cmd+z cmd+z"
+      },
+      {
         "command": "cabinetplugin.disseratorActions",
         "key": "ctrl+alt+shift+d",
         "mac": "cmd+d cmd+d"
@@ -125,7 +130,12 @@
       },
       {
         "command": "cabinetplugin.cabinetActions",
-        "title": "Actions",
+        "title": "Cabinet Actions",
+        "category": "Cabinet"
+      },
+      {
+        "command": "cabinetplugin.zoteroActions",
+        "title": "Zotero Actions",
         "category": "Cabinet"
       },
       {
@@ -212,11 +222,21 @@
         "command": "cabinetplugin.writing-plan.outline.refresh",
         "title": "Refresh Outline",
         "category": "Writing Plan"
+      },
+      {
+        "command": "cabinetplugin.writing-plan.toggle",
+        "title": "Toggle Writing Plan",
+        "category": "Writing Plan"
       }
     ],
     "configuration": {
       "title": "Cabinet",
       "properties": {
+        "cabinetplugin.writing-plan.enable": {
+          "type": "boolean",
+          "description": "Enable Writing Plan",
+          "default": true
+        },
         "cabinetplugin.writing-plan.enableCodeLens": {
           "type": "boolean",
           "default": true
