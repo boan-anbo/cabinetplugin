@@ -30,6 +30,9 @@ import { cabinetInstanceActions as cabinetActions } from './cabinet-core/quickac
 import { testDisserator } from './cabinet-core/disserator/test-disserator';
 import { disseratorActions } from './cabinet-core/quickactions/disserator-quickactions/disserator-actions';
 import { registerWritingPlan } from './writing-plan/register-writing-plan';
+import { cabinetCursorChangeListener } from './cabinet-core/liseners/cursor-change-listener';
+import { toggleWritingPlan } from './cabinet-core/commands/toggle-writing-plan';
+import { zoteroActions } from './cabinet-core/quickactions/zotero-actions';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -133,6 +136,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	// update all default settings, otherwise some global settings will keep the state when Cabinet restarts, such as preview sync with editor;
 	updateDefaultSettings();
 
+	// register writing plan commands
+	context.subscriptions.push(vscode.commands.registerCommand('cabinetplugin.writing-plan.toggle', toggleWritingPlan));
 
 	// context.subscriptions.push(stopCabinetCmd);
 
@@ -174,6 +179,12 @@ export async function activate(context: vscode.ExtensionContext) {
 			// register extract pdf actions
 			context.subscriptions.push(vscode.commands.registerCommand('cabinetplugin.extractPdfCards', async () => {
 				extractPdfCards(context);
+			}));
+
+			// register zotero actions
+
+			context.subscriptions.push(vscode.commands.registerCommand('cabinetplugin.zoteroActions', async () => {
+				zoteroActions(context);
 			}));
 
 			// register markdown points actions actions
@@ -251,9 +262,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			vscode.workspace.onDidChangeTextDocument(markdownChangePreviewListener);
 
+			// register preview cursor listener
+			context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(cabinetCursorChangeListener));
+
 			const cabinetJsonFile = (cabinetNodeInstance as CabinetNode).ccjFilename;
 			const cardCount = (cabinetNodeInstance as CabinetNode).cardCount;
 			vscode.window.showInformationMessage(`Started: ${cardCount} cards loaded from ${cabinetJsonFile}.`);
+
 
 			updateCurrentCards();
 

@@ -1,4 +1,6 @@
 import { DecorationOptions, ExtensionContext, Position, Range, TextEditorDecorationType, ThemableDecorationAttachmentRenderOptions, window, workspace } from "vscode";
+import { arabic2roman } from "../../utils/arabic-roman";
+import { SectionTreeItem } from "../entities/section-item";
 import { getCurrentPlan } from "../writing-plan-instance";
 
 // let currentHighlight: TextEditorDecorationType;
@@ -8,6 +10,12 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
     console.log('decorator sample is activated');
 
     let timeout: NodeJS.Timer | undefined = undefined;
+
+    // the type instance should be created only once, because it will be cleared when set again, otherwise it will multiply.
+    // what is actualy updated is the decoration options, which contains the updated information such as text, color, etc.
+    const sectionDecorationType = window.createTextEditorDecorationType({
+        textDecoration: 'underline',
+    });
 
     const updateDecorations = () => {
         const activeEditor = window.activeTextEditor;
@@ -22,10 +30,7 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
             }
             const regEx = plan.options.getMarkerRegex();
             const text = activeEditor.document.getText();
-            const sectionDecorationType = window.createTextEditorDecorationType({
-                backgroundColor: 'green',
-                border: '2px solid white',
-            });
+
             const sectionDecorationOptions: DecorationOptions[] = [];
             let match;
             while ((match = regEx.exec(text))) {
@@ -33,21 +38,41 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
                 const startPos = activeEditor.document.positionAt(match.index);
                 const endPos = activeEditor.document.positionAt(match.index + match[0].length);
                 const range = new Range(startPos, endPos);
+                const markerString = activeEditor.document.getText(range);
+                const isOpenMarker = plan.isOpenMarker(markerString);
                 const section = plan.getSectionByMarker(startPos.line, startPos.character, match[0].length);
+                if (!section) {
+                    return;
+                }
+                const sectionItem = SectionTreeItem.fromSection(section);
                 // const decoration = { range: new Range(startPos, endPos), hoverMessage: 'Number **' + match[0] + '**' };
-                const decoratationType = {
+                const mainColor = 'rgba(0, 0, 0, 0.3)';
+                const isCloseMarkerNextToOpenMarker = !isOpenMarker && (section.markerOpenLine === section.markerCloseLine - 1) || (section.markerOpenLine === section.markerCloseLine);
+                const decorationType = {
                     range,
                     renderOptions: {
-
+                        before: {
+                            fontSize: 'smaller',
+                            contentText: `${arabic2roman(section?.level, 1)}.${arabic2roman(section?.levelOrder, 1)}`,
+                            // top, right, bottom, left
+                            margin: '0 10px 0 0',
+                            // set to transparent if is not open marker
+                            color: isOpenMarker ? mainColor : 'rgba(0, 0, 0, 0)',
+                        } as ThemableDecorationAttachmentRenderOptions,
                         after: {
-                            contentText: section?.wordTarget?.toString() ?? "Word target",
-                            color: 'black',
+                            fontSize: 'smaller',
+                            contentText: isCloseMarkerNextToOpenMarker ? '' : sectionItem.description,
+                            // set color to beautiful light blue
+                            color: sectionItem.section.wordBalance < 0 ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 228, 0, 1)',
+                            // top, right, bottom, left
+                            margin: '0 0 0 20px',
+
                         } as ThemableDecorationAttachmentRenderOptions
                     }
 
                 } as DecorationOptions;
                 // set the decoration type
-                sectionDecorationOptions.push(decoratationType);
+                sectionDecorationOptions.push(decorationType);
 
             }
             // set
@@ -55,13 +80,7 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
             activeEditor.setDecorations(sectionDecorationType, sectionDecorationOptions);
 
         }
-    }
-
-
-    // export const clearSectionAnnotations = () => {
-    //     // clear the highlight text editor decoration
-    //     currentHighlight?.dispose();
-    // }
+    };
 
     function triggerUpdateDecorations(throttle: boolean = false) {
         if (timeout) {
@@ -81,12 +100,12 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
         triggerUpdateDecorations();
     }
 
-    window.onDidChangeActiveTextEditor(editor => {
-        activeEditor = editor;
-        if (editor) {
-            triggerUpdateDecorations();
-        }
-    }, null, context.subscriptions);
+    // window.onDidChangeActiveTextEditor(editor => {
+    //     activeEditor = editor;
+    //     if (editor) {
+    //         triggerUpdateDecorations();
+    //     }
+    // }, null, context.subscriptions);
 
     workspace.onDidChangeTextDocument(event => {
         if (activeEditor && event.document === activeEditor.document) {

@@ -13,17 +13,26 @@ export async function goToLocation(location: Location, focusEditor: boolean = fa
 // jump to line in current active editor
 export async function goToLine(line: number, documentUri?: string) {
 
+    // parse line if it's string
+    if (typeof line === "string") {
+        line = parseInt(line, 10);
+        // check is line is integer
+        if (isNaN(line)) {
+            return;
+        }
+    }
+
     let editor = undefined;
 
     if (!documentUri) {
-
         editor = vscode.window.activeTextEditor;
     } else {
         // searching in visible editors
         editor = vscode.window.visibleTextEditors.find(e => e.document.uri.toString() === documentUri);
         if (!editor) {
+
             // open document in a new editor
-            const doc = await vscode.workspace.openTextDocument(documentUri)
+            const doc = await vscode.workspace.openTextDocument(documentUri);
             // show the editor with the doc
             editor = await vscode.window.showTextDocument(doc);
         }

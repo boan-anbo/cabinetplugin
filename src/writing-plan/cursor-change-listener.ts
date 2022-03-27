@@ -1,6 +1,6 @@
-import { TextEditorSelectionChangeEvent } from "vscode";
+import { Position, Range, TextEditorSelectionChangeEvent } from "vscode";
 import { getWrappingSectionByCursorPosition } from "./go-to-section-ends";
-import { clearHighlightLines, highlightLines } from "./decorators/line-highlighter";
+import { clearHighlightLines, highlightLines, highlightMarker } from "./decorators/line-highlighter";
 
 export const cursorChangeHighlightListener = (e: TextEditorSelectionChangeEvent) => {
     // if the cursor is in a section, update the status bar with the section title
@@ -14,5 +14,15 @@ export const cursorChangeHighlightListener = (e: TextEditorSelectionChangeEvent)
         const sectionRange = sectionIn.getSectionLinesRange();
         const [startPosition, endPosition] = sectionRange;
         highlightLines(startPosition.line, startPosition.index, endPosition.line, endPosition.index - 3);
+
+        highlightMarker(new Range(new Position(
+            sectionIn.markerOpenLine,
+            sectionIn.markerOpenIndex + 1
+        ),
+            new Position(
+                sectionIn.markerOpenLine,
+                sectionIn.markerOpenEndIndex
+            )
+        ));
     }
-}
+};

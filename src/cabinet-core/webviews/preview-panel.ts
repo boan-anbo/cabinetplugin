@@ -123,9 +123,23 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
                         const cardId = JSON.parse(message.text) as CabinetCardIdentifier;
                         openCardSourceFile(cardId.id);
                         return;
-                    case 'jumpToLine':
+                    case 'jumpToLineByCard':
                         const { line, documentUri } = JSON.parse(message.cardPlace) as CardPlace;
                         goToLine(line, documentUri);
+                        return;
+                    case 'jumpToLine':
+                        // parse received message uri
+                        if (message.line) {
+                            goToLine(message.line, message.uri);
+                        }
+                        return;
+                    case 'requestDocumentUri':
+                        const activeEditor = vscode.window.activeTextEditor;
+                        if (activeEditor) {
+                            const documentUri = activeEditor.document.uri.toString();
+                            cabinetPreviewPanel?.webview.postMessage({ command: 'setDocumentUri', documentUri });
+                        }
+                        console.log('requestDocumentUri', message);
                         return;
                     case 'insertLatex':
                         const cci = CabinetCardIdentifier.fromJsonString(message.text);
@@ -140,7 +154,7 @@ export const showPreview = async (html: string, documentTitle: string): Promise<
                                     `[${card.source?.pageIndex}]{${card.source?.uniqueId}}`,
                                     cciLine,
                                     ""
-                            ].join('\n')
+                                ].join('\n')
                                 , {
                                     linesBefore: 0,
                                     linesAfter: 0,
@@ -196,6 +210,14 @@ export const freePreviewSync = async () => {
 export const postMessageToPreviewPanel = async (message: any) => {
     await cabinetPreviewPanel?.webview.postMessage(message);
 }
+
+export const scrollToLineInPreview = (line: number, uri?: string) => {
+    postMessageToPreviewPanel({
+        command: 'goToLine',
+        line,
+        documentUri: uri // if uri is provided, only matched uri will be scrolled to
+    });
+};
 
 export const sendUpdateCardRequestToPreviewPanelCommand = (cabinetNode: CabinetNode): vscode.Disposable => {
     // add a vscode command
