@@ -45,7 +45,7 @@ export class SectionTreeItem extends WritingPlanTreeItem {
         this.section = section;
 
         this.tooltip = section.wordCount.toString();
-        this.description = `${section.title ? `"${section.title.trim()}": ` : ''} W: ${section?.wordCount} | B: ${section.wordBalance} | T: ${section?.wordTarget}`;
+        this.description = `${section.title ? `"${section.title.trim()}": ` : ''} W: ${section?.wordCount} | S: ${section?.wordCountSelf} | B: ${section.wordBalance} | T: ${section?.wordTarget}`;
 
         if (section.parentId === null) {
             this.contextValue = 'root';

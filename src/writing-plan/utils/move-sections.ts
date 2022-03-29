@@ -22,7 +22,7 @@ export class MovePosition {
 
 
 export const moveSections = async (sectionMoved: Section, sectionToMoveTo: Section, insertRelation: InsertRelation) => {
-    const beginPosition = new MovePosition(sectionMoved.markerOpenLine, sectionMoved.markerOpenIndex);
+    const beginPosition = new MovePosition(sectionMoved.markerOpenLine, sectionMoved.markerOpenStartIndex);
     const endPosition = new MovePosition(sectionMoved.markerCloseLine, sectionMoved.markerCloseEndIndex + 1);
     let insertPosition;
     switch (insertRelation) {
@@ -30,7 +30,7 @@ export const moveSections = async (sectionMoved: Section, sectionToMoveTo: Secti
         case InsertRelation.Before:
             insertPosition = new MovePosition(
                 sectionToMoveTo.markerOpenLine,
-                sectionToMoveTo.markerOpenIndex > 0 ? sectionToMoveTo.markerOpenIndex - 1 : 0
+                sectionToMoveTo.markerOpenStartIndex > 0 ? sectionToMoveTo.markerOpenStartIndex - 1 : 0
             );
             break;
         case InsertRelation.After:
