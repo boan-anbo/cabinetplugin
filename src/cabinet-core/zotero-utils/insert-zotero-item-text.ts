@@ -7,6 +7,7 @@ export enum InsertZoteroItemTextType {
 }
 
 export const insertZoteroItemsText = async (zoteroItems: ZoteroItem[], type: InsertZoteroItemTextType, opt?: InsertOption) => {
+    // loop
     for await (const zoteroItem of zoteroItems) {
         await insertZoteroItemText(zoteroItem, type, opt);
     }
@@ -19,11 +20,11 @@ export const insertZoteroItemText = async (zoteroItem: ZoteroItem, type: InsertZ
     let text = undefined;
     switch (type) {
         case InsertZoteroItemTextType.Latex:
-            if (!zoteroItem.citeKey) {
+            if (!zoteroItem.citationKey) {
                 throw new Error(`Cannot insert Zotero item text as latex autocites: Zotero item has no cite key`);
                 return;
             }
-            text = `[][]{${zoteroItem.citeKey}}`;
+            text = `[][]{${zoteroItem.citationKey}}`;
             break;
         default:
             break;
