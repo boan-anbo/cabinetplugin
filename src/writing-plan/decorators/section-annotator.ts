@@ -1,4 +1,4 @@
-import { DecorationOptions, ExtensionContext, Position, Range, TextEditorDecorationType, ThemableDecorationAttachmentRenderOptions, window, workspace } from "vscode";
+import { DecorationInstanceRenderOptions, DecorationOptions, ExtensionContext, Position, Range, TextEditorDecorationType, ThemableDecorationAttachmentRenderOptions, window, workspace } from "vscode";
 import { arabic2roman } from "../../utils/arabic-roman";
 import { SectionTreeItem } from "../entities/section-item";
 import { getCurrentPlan } from "../writing-plan-instance";
@@ -17,6 +17,29 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
         textDecoration: 'underline',
     });
 
+    const mainGrayColor = 'rgba(0, 0, 0, 0.3)';
+
+    const mainGreenColor = 'rgba(0, 255, 0, 0.2)';
+    const sectionOpenLineDecorationType = window.createTextEditorDecorationType({
+        // top right bottom left
+        borderWidth: '2px 0px 0px 0px',
+        // set border color dark gray
+        borderColor: mainGrayColor,
+        borderStyle: 'solid',
+        // set background light gray
+        backgroundColor: mainGreenColor,
+        isWholeLine: true,
+    });
+
+    const sectionCloseLineDecorationType = window.createTextEditorDecorationType({
+        // top right bottom left
+        borderWidth: '0px 0px 2px 0px',
+        // set border color dark gray
+        borderColor: mainGrayColor,
+        borderStyle: 'solid',
+        isWholeLine: true,
+    });
+
     const updateDecorations = () => {
         const activeEditor = window.activeTextEditor;
         if (activeEditor) {
@@ -32,6 +55,8 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
             const text = activeEditor.document.getText();
 
             const sectionDecorationOptions: DecorationOptions[] = [];
+            const sectionOpenLineDecorationOptions: DecorationOptions[] = [];
+            const sectionCloseLineDecorationOptions: DecorationOptions[] = [];
             let match;
             while ((match = regEx.exec(text))) {
                 // const markerLine = activeEditor.document.lineAt(match.index);
@@ -46,18 +71,18 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
                 }
                 const sectionItem = SectionTreeItem.fromSection(section);
                 // const decoration = { range: new Range(startPos, endPos), hoverMessage: 'Number **' + match[0] + '**' };
-                const mainColor = 'rgba(0, 0, 0, 0.3)';
                 const isCloseMarkerNextToOpenMarker = !isOpenMarker && (section.markerOpenLine === section.markerCloseLine - 1) || (section.markerOpenLine === section.markerCloseLine);
                 const decorationType = {
                     range,
                     renderOptions: {
+
                         before: {
                             fontSize: 'smaller',
                             contentText: `${arabic2roman(section?.level, 1)}.${arabic2roman(section?.levelOrder, 1)}`,
                             // top, right, bottom, left
                             margin: '0 10px 0 0',
                             // set to transparent if is not open marker
-                            color: isOpenMarker ? mainColor : 'rgba(0, 0, 0, 0)',
+                            color: isOpenMarker ? mainGrayColor : 'rgba(0, 0, 0, 0)',
                         } as ThemableDecorationAttachmentRenderOptions,
                         after: {
                             fontSize: 'smaller',
@@ -74,10 +99,24 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
                 // set the decoration type
                 sectionDecorationOptions.push(decorationType);
 
+                if (isOpenMarker) {
+                    const lineDecorationOptions: DecorationOptions = {
+                        range,
+                    };
+                    sectionOpenLineDecorationOptions.push(lineDecorationOptions);
+                } else {
+                    const lineDecorationOptions: DecorationOptions = {
+                        range,
+                    };
+                    sectionCloseLineDecorationOptions.push(lineDecorationOptions);
+                }
             }
             // set
             console.log('decoration options', sectionDecorationOptions);
             activeEditor.setDecorations(sectionDecorationType, sectionDecorationOptions);
+            activeEditor.setDecorations(sectionOpenLineDecorationType, sectionOpenLineDecorationOptions);
+            activeEditor.setDecorations(sectionCloseLineDecorationType, sectionCloseLineDecorationOptions);
+            // if open marker, set the upper border for the whole line
 
         }
     };

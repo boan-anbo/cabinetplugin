@@ -17,7 +17,7 @@ export const cursorChangeHighlightListener = (e: TextEditorSelectionChangeEvent)
 
         highlightMarker(new Range(new Position(
             sectionIn.markerOpenLine,
-            sectionIn.markerOpenIndex + 1
+            sectionIn.markerOpenStartIndex + 1
         ),
             new Position(
                 sectionIn.markerOpenLine,

@@ -203,16 +203,21 @@
       {
         "command": "writing-plan.outline.moveSectionDown",
         "title": "Move Section Down",
-        "category": "writing-plan",
+        "category": "Writing Plan",
         "icon": {
           "light": "media/section-down.svg",
           "dark": "media/section-down.svg"
         }
       },
       {
+        "command": "writing-plan.copySkeleton",
+        "title": "Copy Skeleton",
+        "category": "Writing Plan"
+      },
+      {
         "command": "writing-plan.outline.moveSectionUp",
         "title": "Move Section Up",
-        "category": "writing-plan",
+        "category": "Writing Plan",
         "icon": {
           "light": "media/section-up.svg",
           "dark": "media/section-up.svg"
