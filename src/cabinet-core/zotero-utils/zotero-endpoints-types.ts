@@ -4,7 +4,7 @@ export interface ZoteroItemsResponse {
 }
 
 export interface ZoteroItem {
-    citeKey: string;
+    citationKey: string;
     item: Item;
     attachments: Attachment[];
 }

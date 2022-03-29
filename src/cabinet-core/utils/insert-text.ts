@@ -26,7 +26,7 @@ export const insertText = async (text: string, opt?: InsertOption, line?: number
 
     if (editor) {
 
-        editor?.edit((textEditorEdit) => {
+        await editor?.edit((textEditorEdit) => {
             if (opt?.firstLineText && opt.firstLineText.length > 0) {
                 textEditorEdit.insert(new Position(editor.selection.active.line, editor.selection.active.character), opt.firstLineText);
             }
@@ -40,7 +40,7 @@ export const insertText = async (text: string, opt?: InsertOption, line?: number
     }
 
     if (editor) {
-        editor?.edit((textEditorEdit) => {
+        await editor?.edit((textEditorEdit) => {
             if (opt?.select) {
                 textEditorEdit.replace(editor.selection, text);
             } else {
@@ -51,11 +51,12 @@ export const insertText = async (text: string, opt?: InsertOption, line?: number
         });
     }
 
-    if (opt?.linesAfter) {
+    if (opt?.linesAfter && opt?.linesAfter > 0) {
         for (let index = 0; index < opt.linesAfter; index++) {
             await vscode.commands.executeCommand("editor.action.insertLineAfter");
         }
     }
+    return;
 
 }
 

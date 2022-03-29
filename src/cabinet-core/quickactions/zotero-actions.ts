@@ -17,13 +17,16 @@ import {
         Uri,
 } from "vscode";
 import { InsertOption } from "../types/insert-option";
-import { getSelectedZoteroItems, getSelectedZoteroPaths } from "../zotero-utils/get-zotero-attachments";
+import { getSearchedZoteroItems, getSelectedZoteroItems, getSelectedZoteroPaths } from "../zotero-utils/get-zotero-attachments";
 import { insertZoteroItemsText, insertZoteroItemText, InsertZoteroItemTextType } from "../zotero-utils/insert-zotero-item-text";
+import { SearchCondition } from "../zotero-utils/zotero-types/zotero-search";
 import { ZoteroPickItem } from "./zotero-pick-item";
 
 
 export enum referenceSourceType {
-        Selected = 'Zotero'
+        SelectedItems = 'Selected Items',
+        Search = 'Search',
+        Collections = 'Browse Collections',
 }
 
 export enum zoteroItemActionType {
@@ -37,8 +40,10 @@ export enum zoteroItemActionType {
  */
 export async function zoteroActions(context: ExtensionContext) {
 
-        const fileSources: QuickPickItem[] = [
-                referenceSourceType.Selected.toString()
+        const zoteroActions: QuickPickItem[] = [
+                referenceSourceType.SelectedItems.toString(),
+                referenceSourceType.Search.toString()
+
         ].map(label => ({ label }));
 
 
@@ -55,13 +60,13 @@ export async function zoteroActions(context: ExtensionContext) {
 
         async function collectInputs() {
                 const state = {} as Partial<State>;
-                await MultiStepInput.run((input) => pickReferenceSources(input, state));
+                await MultiStepInput.run((input) => pickZoteroActions(input, state));
                 return state as State;
         }
 
-        const title = "Pick Entries";
+        const title = "Pick Zotero Actions";
 
-        async function pickReferenceSources(input: MultiStepInput, state: Partial<State>) {
+        async function pickZoteroActions(input: MultiStepInput, state: Partial<State>) {
                 const pick = await input.showQuickPick<
                         QuickPickItem,
                         QuickPickParameters<QuickPickItem>
@@ -69,16 +74,16 @@ export async function zoteroActions(context: ExtensionContext) {
                         title,
                         step: 1,
                         totalSteps: 3,
-                        placeholder: "Reference Sources",
-                        items: fileSources,
-                        activeItem: fileSources[0],
+                        placeholder: "Zotero Actions",
+                        items: zoteroActions,
+                        activeItem: zoteroActions[0],
                         buttons: [],
                         shouldResume: shouldResume,
                 });
 
                 state.items = [];
                 switch (pick.label) {
-                        case referenceSourceType.Selected:
+                        case referenceSourceType.SelectedItems:
                                 try {
 
                                         state.items = ZoteroPickItem.fromZoteroItems(await getSelectedZoteroItems());
@@ -87,6 +92,46 @@ export async function zoteroActions(context: ExtensionContext) {
                                         const errorMessage = error.message ?? 'Unknown error';
                                         window.showErrorMessage(errorMessage);
                                 }
+
+                                return (input: MultiStepInput) => pickZoteroItems(input, state, true);
+                        case referenceSourceType.Search:
+                                const query = await input.showInputBox({
+                                        title,
+                                        step: 2,
+                                        totalSteps: 3,
+                                        prompt: "Search Zotero Items",
+                                        value: '',
+                                        validate: (value): Promise<string | undefined> => {
+                                                if (!value) {
+                                                        return Promise.resolve('Please enter a search query');
+                                                } else if (value.length < 2) {
+                                                        return Promise.resolve('Search query must be at least 3 characters long');
+                                                }
+                                                return Promise.resolve(undefined);
+                                        },
+                                        buttons: [],
+                                        shouldResume: shouldResume,
+                                });
+                                try {
+                                        const searchConditions: SearchCondition[] = [
+                                                {
+                                                        field: 'title',
+                                                        operator: 'contains',
+                                                        query
+                                                },
+                                                {
+                                                        field: 'creator',
+                                                        operator: 'contains',
+                                                        query
+                                                }
+                                        ];
+                                        state.items = ZoteroPickItem.fromZoteroItems(await getSearchedZoteroItems(searchConditions));
+                                } catch (error: any) {
+                                        // show to vscode user
+                                        const errorMessage = error.message ?? 'Unknown error';
+                                        window.showErrorMessage(errorMessage);
+                                }
+                                return (input: MultiStepInput) => pickZoteroItems(input, state);
                         default:
                                 break;
                 }
@@ -95,7 +140,7 @@ export async function zoteroActions(context: ExtensionContext) {
         }
 
 
-        async function pickZoteroItems(input: MultiStepInput, state: Partial<State>) {
+        async function pickZoteroItems(input: MultiStepInput, state: Partial<State>, selectAll = false) {
 
                 // automatically select all items
                 const picks = await input.showQuickPickMulti<
@@ -106,7 +151,7 @@ export async function zoteroActions(context: ExtensionContext) {
                         step: 1,
                         totalSteps: 3,
                         placeholder: `Pick Zotero Items`,
-                        selectAll: true,
+                        selectAll,
                         items: state.items?.map(item => { item.picked = true; return item }) ?? [],
                         buttons: [],
                         shouldResume: shouldResume,
@@ -142,7 +187,7 @@ export async function zoteroActions(context: ExtensionContext) {
 
                                 if (state.selectedItems) {
                                         await insertZoteroItemsText(state.selectedItems.map(pickItem => pickItem.item), InsertZoteroItemTextType.Latex, {
-                                                linesAfter: state.selectedItems.length > 3 ? 1 : 0,
+                                                linesAfter: (state.selectedItems.length > 3) ? 1 : 0,
                                         } as InsertOption);
                                 }
                                 return;

@@ -531,7 +531,7 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string, docume
             addPointButton.style.outline = "none";
             addPointButton.style.padding = "6px";
             addPointButton.innerText = "+";
-            addPointButton.onclick = function () {
+            addPointButton.onclick = function (event) {
               let finalText = text;
               // need to create a new variable for text. manipulate the text reference directly will change the value of the original elment.
               if (point.tagName === "UL") {
@@ -544,6 +544,10 @@ export function getPreviewHtmlTemplate(insertHtml: string, title: string, docume
                 command: "addPoint",
                 text: finalText,
               });
+
+              // otherwise it will trigger jump function
+              event.stopPropagation();
+
             };
 
             // insert button after the element
