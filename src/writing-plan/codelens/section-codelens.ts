@@ -61,6 +61,28 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
                     // }));
 
 
+                    // if it's open marker, add a button to jump to end
+                    if (!isCloseMarker) {
+                        this.codeLenses.push(new vscode.CodeLens(range, {
+                            title: ` > `,
+                            tooltip: `Jump to close marker`,
+                            command: 'cabinetplugin.writing-plan.goToLine',
+                            arguments: [
+                                section?.markerCloseLine,
+                            ]
+                        }));
+                    } else {
+                        this.codeLenses.push(new vscode.CodeLens(range, {
+                            title: ` < `,
+                            tooltip: `Go to open marker`,
+                            command: 'cabinetplugin.writing-plan.goToLine',
+                            arguments: [
+                                section?.markerOpenLine,
+                            ]
+                        }));
+                    }
+
+
                     // give navigation buttons only to open markers to lessen visual pollution. The close marker can be used to jump to the beginning to use the navigation buttons
                     if (!isCloseMarker) {
                         const navigationLenses = getNavigationCodeLenses(range, section);

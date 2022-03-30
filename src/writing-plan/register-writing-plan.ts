@@ -11,7 +11,7 @@ import { cursorChangeHighlightListener } from './cursor-change-listener';
 import { TestViewDragAndDrop } from './tree-view-drag-and-drop';
 import { registerSectionDecorations } from './decorators/section-annotator';
 import { registerCursorDecorations } from './decorators/cursor-annotator';
-import { copySkeletonPlanToVscodeClipboard } from './commands/get-skeleton-copy';
+import { copySkeletonPlanToVscodeClipboard, writeSkeletonCopyIntoNewFile } from './commands/get-skeleton-copy';
 
 export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 
@@ -37,6 +37,8 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 	vscode.commands.registerCommand('writing-plan.outline.moveSectionDown', treeview.moveSectionDown);
 	// register copy skeleton copy command
 	vscode.commands.registerCommand('writing-plan.copySkeleton', copySkeletonPlanToVscodeClipboard);
+	// register write skeleton copy into new file command
+	vscode.commands.registerCommand('writing-plan.writeSkeleton', writeSkeletonCopyIntoNewFile);
 
 	// register section decorators
 	registerSectionDecorations(context);
