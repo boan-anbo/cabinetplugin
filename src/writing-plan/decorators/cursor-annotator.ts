@@ -30,13 +30,13 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
                 range: new Range(cursorPosition, new Position(cursorPosition.line, endOfLine)),
                 renderOptions: {
                     after: {
-                        contentText: sectionItem.description,
+                        contentText: `${sectionItem.description}`,
                         // if balance is negative, it will be pink color, if positive, it will be green color
                         color: sectionItem.section.wordBalance < 0 ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 228, 0, 1)',
                         // top, right, bottom, left
                         margin: '0 0 0 20px',
                         // set smaller css font size
-                        fontSize: 'smaller',
+                        fontSize: 'small',
                     } as ThemableDecorationAttachmentRenderOptions
                 }
 
@@ -83,4 +83,8 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
             clearDecoration();
         };
     }, null, context.subscriptions);
+
+    function dispose() {
+        cursorDecorationType.dispose();
+    }
 };

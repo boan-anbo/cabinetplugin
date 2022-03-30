@@ -1,4 +1,4 @@
-import { DecorationInstanceRenderOptions, DecorationOptions, ExtensionContext, Position, Range, TextEditorDecorationType, ThemableDecorationAttachmentRenderOptions, window, workspace } from "vscode";
+import { DecorationInstanceRenderOptions, DecorationOptions, Disposable, ExtensionContext, Position, Range, TextEditorDecorationType, ThemableDecorationAttachmentRenderOptions, window, workspace } from "vscode";
 import { arabic2roman } from "../../utils/arabic-roman";
 import { SectionTreeItem } from "../entities/section-item";
 import { getCurrentPlan } from "../writing-plan-instance";
@@ -78,7 +78,7 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
 
                         before: {
                             fontSize: 'smaller',
-                            contentText: `${arabic2roman(section?.level, 1)}.${arabic2roman(section?.levelOrder, 1)}`,
+                            contentText: sectionItem.sectionLevelOrderString,
                             // top, right, bottom, left
                             margin: '0 10px 0 0',
                             // set to transparent if is not open marker
@@ -139,12 +139,12 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
         triggerUpdateDecorations();
     }
 
-    // window.onDidChangeActiveTextEditor(editor => {
-    //     activeEditor = editor;
-    //     if (editor) {
-    //         triggerUpdateDecorations();
-    //     }
-    // }, null, context.subscriptions);
+    window.onDidChangeActiveTextEditor(editor => {
+        activeEditor = editor;
+        if (editor) {
+            triggerUpdateDecorations();
+        }
+    }, null, context.subscriptions);
 
     workspace.onDidChangeTextDocument(event => {
         if (activeEditor && event.document === activeEditor.document) {

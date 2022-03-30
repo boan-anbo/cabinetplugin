@@ -3,6 +3,8 @@ import path = require("path");
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
 import { Section } from "writing-plan/build/main/lib/section";
 import { cabinetNodeInstance } from "../../extension";
+import { arabic2roman } from "../../utils/arabic-roman";
+import { generateProgressBar } from "../utils/progress-bar";
 
 export abstract class WritingPlanTreeItem extends TreeItem {
     itemType: WritingPlanItemType = WritingPlanItemType.Section;
@@ -18,6 +20,7 @@ export class SectionTreeItem extends WritingPlanTreeItem {
     cardItems: CardTreeItem[] = [];
     hasCards: boolean;
     cardsNum: number;
+    sectionLevelOrderString: string;
 
     private constructor(
         section: Section,
@@ -29,6 +32,9 @@ export class SectionTreeItem extends WritingPlanTreeItem {
             section.marker,
             collapse ?? TreeItemCollapsibleState.Expanded);
 
+        // set section order string
+        this.sectionLevelOrderString = `${arabic2roman(section?.level, 1)}.${arabic2roman(section?.levelOrder, 1)}`;
+
         const cardItems = [];
         if (cabinetNodeInstance) {
             const cards = cabinetNodeInstance.getAllCardsByCciFromText(section.content);
@@ -37,6 +43,7 @@ export class SectionTreeItem extends WritingPlanTreeItem {
                 cardItems.push(...CardTreeItem.fromCards(cards));
             }
         }
+
 
         // store card items under section items
         this.cardItems = cardItems;
@@ -68,10 +75,9 @@ export class SectionTreeItem extends WritingPlanTreeItem {
 
     updateLabel() {
         const titleLabel = this.section.title ?? this.section.marker;
+        const targetLabel = `<${this.section.wordTarget} | ${this.section.wordCount}>`;
         const cardsLabel = `[${this.cardsNum}]`;
-        const orderLabel = `${this.section.levelOrder + 1}`;
-        super.label = `${orderLabel} ${cardsLabel} ${titleLabel} `;
-
+        super.label = `${this.sectionLevelOrderString} ${targetLabel} ${titleLabel} ${cardsLabel}`;
     }
 
     iconPath = {
@@ -122,9 +128,6 @@ export class CardTreeItem extends WritingPlanTreeItem {
 
     };
 }
-
-
-
 
 export enum WritingPlanItemType {
     Card,

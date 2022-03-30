@@ -215,6 +215,11 @@
         "category": "Writing Plan"
       },
       {
+        "command": "writing-plan.writeSkeleton",
+        "title": "Write Skeleton Into New File",
+        "category": "Writing Plan"
+      },
+      {
         "command": "writing-plan.outline.moveSectionUp",
         "title": "Move Section Up",
         "category": "Writing Plan",
