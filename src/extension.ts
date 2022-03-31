@@ -171,10 +171,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			context.subscriptions.push(vscode.commands.registerCommand('cabinetOutline.refresh', () => cabinetNodeOutlineProvider.refresh()));
 
-			const outlineRefreshListener = vscode.workspace.onDidChangeTextDocument(() => {
-				vscode.commands.executeCommand('cabinetOutline.refresh');
-			});
-			context.subscriptions.push(outlineRefreshListener);
+			// const outlineRefreshListener = vscode.workspace.onDidChangeTextDocument(() => {
+			// 	vscode.commands.executeCommand('cabinetOutline.refresh');
+			// });
+			// context.subscriptions.push(outlineRefreshListener);
 
 			// register extract pdf actions
 			context.subscriptions.push(vscode.commands.registerCommand('cabinetplugin.extractPdfCards', async () => {

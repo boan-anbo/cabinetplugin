@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { WritingPlan } from 'writing-plan';
 import { WritingPlanOptions } from 'writing-plan/build/main/lib/entities/writing-plan-options';
-import { getCurrentPlan, getSectionByRange, getSectionParent, writingPlans } from '../writing-plan-instance';
+import { allCurrentSectionItems, getCurrentPlan, getSectionByRange, getSectionParent, writingPlans } from '../writing-plan-instance';
 import { getNavigationCodeLenses } from './get-section-navigation-lenses';
 
 
@@ -61,10 +61,18 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
                     // }));
 
 
+                    const sectionItem = allCurrentSectionItems.find(item => item.section.id === section.id);
+
+                    const prefixIndentLength = sectionItem?.sectionLevelOrderString.length ?? 0;
+
+                    const adjustedRange = new vscode.Range(
+                        new vscode.Position(range.start.line, range.start.character + prefixIndentLength),
+                        new vscode.Position(range.end.line, range.end.line === range.start.line ? range.end.character + prefixIndentLength : range.end.character)
+                    );
                     // if it's open marker, add a button to jump to end
                     if (!isCloseMarker) {
-                        this.codeLenses.push(new vscode.CodeLens(range, {
-                            title: ` > `,
+                        this.codeLenses.push(new vscode.CodeLens(adjustedRange, {
+                            title: ` ▼ `,
                             tooltip: `Jump to close marker`,
                             command: 'cabinetplugin.writing-plan.goToLine',
                             arguments: [
@@ -72,8 +80,8 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
                             ]
                         }));
                     } else {
-                        this.codeLenses.push(new vscode.CodeLens(range, {
-                            title: ` < `,
+                        this.codeLenses.push(new vscode.CodeLens(adjustedRange, {
+                            title: ` ▲ `,
                             tooltip: `Go to open marker`,
                             command: 'cabinetplugin.writing-plan.goToLine',
                             arguments: [

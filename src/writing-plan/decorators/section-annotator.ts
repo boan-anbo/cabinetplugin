@@ -1,7 +1,7 @@
 import { DecorationInstanceRenderOptions, DecorationOptions, Disposable, ExtensionContext, Position, Range, TextEditorDecorationType, ThemableDecorationAttachmentRenderOptions, window, workspace } from "vscode";
 import { arabic2roman } from "../../utils/arabic-roman";
 import { SectionTreeItem } from "../entities/section-item";
-import { getCurrentPlan } from "../writing-plan-instance";
+import { getCurrentPlan, WritingPlanStatus, writingPlanStatus } from "../writing-plan-instance";
 
 // let currentHighlight: TextEditorDecorationType;
 
@@ -17,7 +17,7 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
         textDecoration: 'underline',
     });
 
-    const mainGrayColor = 'rgba(0, 0, 0, 0.3)';
+    const mainGrayColor = 'rgba(0, 0, 0, 0.5)';
 
     const mainGreenColor = 'rgba(0, 255, 0, 0.2)';
     const sectionOpenLineDecorationType = window.createTextEditorDecorationType({
@@ -139,16 +139,40 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
         triggerUpdateDecorations();
     }
 
-    window.onDidChangeActiveTextEditor(editor => {
-        activeEditor = editor;
-        if (editor) {
-            triggerUpdateDecorations();
+    // subscribe to writing plan status
+    writingPlanStatus.listener.event((status: WritingPlanStatus) => {
+        switch (status) {
+            case WritingPlanStatus.refreshed:
+                triggerUpdateDecorations(true);
+                break;
+            case WritingPlanStatus.shutdown:
+                clearAllDecorations();
+                break;
+            default:
+                break;
         }
-    }, null, context.subscriptions);
+    });
 
-    workspace.onDidChangeTextDocument(event => {
-        if (activeEditor && event.document === activeEditor.document) {
-            triggerUpdateDecorations(true);
+    function clearAllDecorations() {
+        const activeEditor = window.activeTextEditor;
+        if (activeEditor) {
+            activeEditor.setDecorations(sectionDecorationType, []);
+            activeEditor.setDecorations(sectionOpenLineDecorationType, []);
+            activeEditor.setDecorations(sectionCloseLineDecorationType, []);
         }
-    }, null, context.subscriptions);
+
+    }
+
+    // window.onDidChangeActiveTextEditor(editor => {
+    //     activeEditor = editor;
+    //     if (editor) {
+    //         triggerUpdateDecorations();
+    //     }
+    // }, null, context.subscriptions);
+
+    // workspace.onDidChangeTextDocument(event => {
+    //     if (activeEditor && event.document === activeEditor.document) {
+    //         triggerUpdateDecorations(true);
+    //     }
+    // }, null, context.subscriptions);
 }

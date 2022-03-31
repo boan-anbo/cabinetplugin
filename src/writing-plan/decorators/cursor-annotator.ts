@@ -2,6 +2,8 @@ import { DecorationOptions, ExtensionContext, Position, Range, TextEditorDecorat
 import { Section } from "writing-plan/build/main/lib/section";
 import { SectionTreeItem } from "../entities/section-item";
 import { getWrappingSectionByCursorPosition } from "../go-to-section-ends";
+import { writingPlanTreeView } from "../register-writing-plan";
+import { allCurrentSectionItems } from "../writing-plan-instance";
 
 export const registerCursorDecorations = (context: ExtensionContext) => {
 
@@ -74,11 +76,25 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
         const lineContent = event.textEditor.document.lineAt(cursorPosition.line);
         const sectionIn = getWrappingSectionByCursorPosition(cursorPosition, true);
 
+
         const isOnTheSameLineAsSectionMarker = (cursorPosition.line === sectionIn?.markerOpenLine || cursorPosition.line === sectionIn?.markerCloseLine);
 
         if (cursorPosition && sectionIn && !isOnTheSameLineAsSectionMarker) {
             const endOfLine = lineContent.text.length;
             triggerUpdateDecorations(sectionIn, cursorPosition, endOfLine);
+
+            // highlight the current section in treeview writing plan outline
+            if (writingPlanTreeView && sectionIn) {
+                // get section item from the tree view that includes the sectionIn
+                const sectionItem = allCurrentSectionItems.find(item => item.section.id === sectionIn.id);
+                console.log('Highlighting', sectionIn, sectionItem);
+                // suppress typescript warning
+
+                if (sectionItem) {
+                    writingPlanTreeView.treeView.reveal(sectionItem);
+                }
+
+            }
         } else {
             clearDecoration();
         };

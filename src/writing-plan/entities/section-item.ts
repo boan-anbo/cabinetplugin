@@ -1,5 +1,6 @@
 import { Card } from "cabinet-node";
 import path = require("path");
+import { v4 } from "uuid";
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
 import { Section } from "writing-plan/build/main/lib/section";
 import { cabinetNodeInstance } from "../../extension";
@@ -15,6 +16,7 @@ export abstract class WritingPlanTreeItem extends TreeItem {
 }
 
 export class SectionTreeItem extends WritingPlanTreeItem {
+    id: string = v4();
     section: Section;
     contextValue: 'root' | 'child';
     cardItems: CardTreeItem[] = [];
@@ -52,7 +54,7 @@ export class SectionTreeItem extends WritingPlanTreeItem {
         this.section = section;
 
         this.tooltip = section.wordCount.toString();
-        this.description = `${section.title ? `"${section.title.trim()}": ` : ''} W: ${section?.wordCount} | S: ${section?.wordCountSelf} | B: ${section.wordBalance} | T: ${section?.wordTarget}`;
+        this.description = `${section.title ? `"${section.title.trim()}": ` : ''} W: ${section?.wordCount} | S: ${section?.wordCountSelf} | B: ${section.wordBalance} | T: ${section?.wordTargetNominal} ${section.isSectionTargetOverflown ? `+ ${section.wordTargetOverflow}` : ''}`;
 
         if (section.parentId === null) {
             this.contextValue = 'root';
@@ -75,7 +77,7 @@ export class SectionTreeItem extends WritingPlanTreeItem {
 
     updateLabel() {
         const titleLabel = this.section.title ?? this.section.marker;
-        const targetLabel = `<${this.section.wordTarget} | ${this.section.wordCount}>`;
+        const targetLabel = `<${this.section.isSectionTargetOverflown ? `${this.section.wordTargetNominal} + ${this.section.wordTargetOverflow}` : this.section.wordTargetNominal} | ${this.section.wordCount}>`;
         const cardsLabel = `[${this.cardsNum}]`;
         super.label = `${this.sectionLevelOrderString} ${targetLabel} ${titleLabel} ${cardsLabel}`;
     }
