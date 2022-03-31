@@ -12,7 +12,7 @@ export async function goToLine(line: number, index?: number, documentUri?: strin
         editor = window.visibleTextEditors.find(e => e.document.uri.toString() === documentUri);
         if (!editor) {
             // open document in a new editor
-            const doc = await workspace.openTextDocument(documentUri)
+            const doc = await workspace.openTextDocument(documentUri);
             // show the editor with the doc
             editor = await window.showTextDocument(doc);
         }
@@ -22,7 +22,7 @@ export async function goToLine(line: number, index?: number, documentUri?: strin
 
         const position = new Position(line, index ?? 0);
         editor.selection = new Selection(position, position);
-        editor.revealRange(new Range(position, position), TextEditorRevealType.InCenter);
+        editor.revealRange(new Range(position, position), TextEditorRevealType.InCenterIfOutsideViewport);
     }
     return;
 }

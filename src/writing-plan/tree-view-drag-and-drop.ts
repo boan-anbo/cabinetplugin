@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { CardTreeItem, SectionTreeItem, WritingPlanTreeItem } from './entities/section-item';
 import { InsertRelation, moveSections } from './utils/move-sections';
-import { allCurrentSectionItems, getCurrentPlan, refreshCurrentPlan, writingPlanStatus, WritingPlanStatus } from './writing-plan-instance';
+import { writingPlanInstance, WritingPlanStatus } from './writing-plan-instance';
 
 export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPlanTreeItem> {
 
@@ -27,12 +27,14 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
 
         this.treeView = view;
 
-        writingPlanStatus.listener.event(this.writingPlanStatusHandler);
+        // if not bind, this handler will not be able access THIS instance
+        writingPlanInstance.writingPlanStatus.listener.event(this.writingPlanStatusHandler.bind(this));
+
     }
 
-    writingPlanStatusHandler(status: WritingPlanStatus): void {
-        console.log('writing plan status changed, tree items:', this.getChildren());
+    async writingPlanStatusHandler(status: WritingPlanStatus): Promise<void> {
         switch (status) {
+            // show user information
             case WritingPlanStatus.refreshed:
                 this.refresh();
                 break;
@@ -78,11 +80,11 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
 
     dispose(): void {
         // nothing to dispose
-        this.treeView.dispose();
+        // this.treeView.dispose();
     }
 
     moveSectionUp = async (sectionItem: SectionTreeItem) => {
-        const currentPlan = getCurrentPlan();
+        const currentPlan = writingPlanInstance.getCurrentPlan();
         if (currentPlan === null) {
             return;
         }
@@ -90,7 +92,7 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
         const sectionToMoveTo = currentPlan.getPreviousSiblingSection(sectionToMove.id);
         if (sectionToMoveTo) {
             await moveSections(sectionToMove, sectionToMoveTo, InsertRelation.Before);
-            refreshCurrentPlan();
+            writingPlanInstance.refreshCurrentPlan();
         } else {
             // console.log('Section already on top');
             // show information message
@@ -99,7 +101,7 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
     };
 
     moveSectionDown = async (sectionItem: SectionTreeItem) => {
-        const currentPlan = getCurrentPlan();
+        const currentPlan = writingPlanInstance.getCurrentPlan();
         if (currentPlan === null) {
             return;
         }
@@ -107,7 +109,7 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
         const sectionToMoveTo = currentPlan.getNextSiblingSection(sectionToMove.id);
         if (sectionToMoveTo) {
             await moveSections(sectionToMove, sectionToMoveTo, InsertRelation.After);
-            refreshCurrentPlan();
+            writingPlanInstance.refreshCurrentPlan();
         } else {
             // console.log('Section already on top');
             // show information message
@@ -119,13 +121,13 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
 // helper functions
 const getSectionItemParent = (sectionItem: WritingPlanTreeItem): WritingPlanTreeItem | null => {
 
-    const currentPlan = getCurrentPlan();
+    const currentPlan = writingPlanInstance.getCurrentPlan();
     if (currentPlan === null) {
         return null;
     }
     if (sectionItem instanceof SectionTreeItem) {
 
-        const section = allCurrentSectionItems.find(s => s.section.id === sectionItem.section.parentId);
+        const section = writingPlanInstance.allCurrentSectionItems.find(s => s.section.id === sectionItem.section.parentId);
 
         return section ?? null;
     }
@@ -134,31 +136,31 @@ const getSectionItemParent = (sectionItem: WritingPlanTreeItem): WritingPlanTree
 };
 
 const getSectionItemChildren = (sectionItem: WritingPlanTreeItem): WritingPlanTreeItem[] => {
-    const currentPlan = getCurrentPlan();
+    const currentPlan = writingPlanInstance.getCurrentPlan();
     if (currentPlan === null) {
         return [];
     }
     const allChildren: WritingPlanTreeItem[] = [];
     if (sectionItem instanceof SectionTreeItem) {
 
-        const sections = allCurrentSectionItems.filter(s => s.section.parentId === sectionItem.section.id);
-        allChildren.push(...sections);
+        const childrenSections = writingPlanInstance.allCurrentSectionItems.filter(s => s.section.parentId === sectionItem.section.id);
+        allChildren.push(...childrenSections);
 
         if (sectionItem.hasCards) {
             allChildren.push(...sectionItem.cardItems);
         }
     }
 
-    return allChildren;
+    return allChildren ?? [];
 };
 
 const getRootSectionItems = (): WritingPlanTreeItem[] => {
-    const currentPlan = getCurrentPlan();
+    const currentPlan = writingPlanInstance.getCurrentPlan();
     if (currentPlan === null) {
         return [];
     }
     // I need to convert all sections to section items first so that I can calculate cards among them, such as adding children section's cards to parent sections. And then filter out the children. This might be expensive, and could be optimized later.
-    return allCurrentSectionItems.filter(sectionItem => sectionItem.section.parentId === null);
+    return writingPlanInstance.allCurrentSectionItems.filter(sectionItem => sectionItem.section.parentId === null) ?? [];
 };
 
 

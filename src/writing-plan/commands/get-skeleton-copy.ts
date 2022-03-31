@@ -1,8 +1,8 @@
 import { env, Uri, window, workspace } from "vscode";
-import { getCurrentPlan } from "../writing-plan-instance";
 import * as fs from "fs";
+import { writingPlanInstance } from "../writing-plan-instance";
 export const getSkeletonCopy = (): string => {
-    return getCurrentPlan()?.getSkeletonPlan() ?? '';
+    return writingPlanInstance.getCurrentPlan()?.getSkeletonPlan() ?? '';
 }
 
 export const copySkeletonPlanToVscodeClipboard = () => {

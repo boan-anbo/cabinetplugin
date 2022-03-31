@@ -1,7 +1,8 @@
 import { DecorationInstanceRenderOptions, DecorationOptions, Disposable, ExtensionContext, Position, Range, TextEditorDecorationType, ThemableDecorationAttachmentRenderOptions, window, workspace } from "vscode";
 import { arabic2roman } from "../../utils/arabic-roman";
 import { SectionTreeItem } from "../entities/section-item";
-import { getCurrentPlan, WritingPlanStatus, writingPlanStatus } from "../writing-plan-instance";
+import { writingPlanInstance, WritingPlanStatus } from "../writing-plan-instance";
+import { annotatorColors } from "./annotator-colors";
 
 // let currentHighlight: TextEditorDecorationType;
 
@@ -17,27 +18,35 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
         textDecoration: 'underline',
     });
 
-    const mainGrayColor = 'rgba(0, 0, 0, 0.5)';
-
+    const mainBlueColor = 'rgba(82, 163, 250, 0.5)';
+    const openGrayColor = 'rgba(150, 150, 150, 0.2)';
+    const closeGrayColor = 'rgba(150, 150, 150, 0.1)';
     const mainGreenColor = 'rgba(0, 255, 0, 0.2)';
     const sectionOpenLineDecorationType = window.createTextEditorDecorationType({
         // top right bottom left
-        borderWidth: '2px 0px 0px 0px',
+        borderWidth: '3px 2px 0px 2px',
+        // make border rounded at the top
+        borderRadius: '10px 10px 0px 0px',
         // set border color dark gray
-        borderColor: mainGrayColor,
+        borderColor: mainBlueColor,
+        color: mainBlueColor,
         borderStyle: 'solid',
         // set background light gray
-        backgroundColor: mainGreenColor,
+        backgroundColor: openGrayColor,
         isWholeLine: true,
     });
 
     const sectionCloseLineDecorationType = window.createTextEditorDecorationType({
         // top right bottom left
-        borderWidth: '0px 0px 2px 0px',
+        borderWidth: '0px 2px 3px 2px',
+        // make border rounded at the top
+        borderRadius: '0px 0px 10px 10px',
         // set border color dark gray
-        borderColor: mainGrayColor,
+        borderColor: mainBlueColor,
         borderStyle: 'solid',
+        backgroundColor: closeGrayColor,
         isWholeLine: true,
+        color: mainBlueColor,
     });
 
     const updateDecorations = () => {
@@ -47,7 +56,7 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
             if (!activeEditor) {
                 return;
             }
-            const plan = getCurrentPlan();
+            const plan = writingPlanInstance.getCurrentPlan();
             if (!plan) {
                 return;
             }
@@ -72,6 +81,8 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
                 const sectionItem = SectionTreeItem.fromSection(section);
                 // const decoration = { range: new Range(startPos, endPos), hoverMessage: 'Number **' + match[0] + '**' };
                 const isCloseMarkerNextToOpenMarker = !isOpenMarker && (section.markerOpenLine === section.markerCloseLine - 1) || (section.markerOpenLine === section.markerCloseLine);
+
+
                 const decorationType = {
                     range,
                     renderOptions: {
@@ -80,15 +91,16 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
                             fontSize: 'smaller',
                             contentText: sectionItem.sectionLevelOrderString,
                             // top, right, bottom, left
-                            margin: '0 10px 0 0',
+                            margin: '0 10px 0 10px',
+
                             // set to transparent if is not open marker
-                            color: isOpenMarker ? mainGrayColor : 'rgba(0, 0, 0, 0)',
+                            color: isOpenMarker ? mainBlueColor : 'rgba(0, 0, 0, 0)',
                         } as ThemableDecorationAttachmentRenderOptions,
                         after: {
                             fontSize: 'smaller',
                             contentText: isCloseMarkerNextToOpenMarker ? '' : sectionItem.description,
                             // set color to beautiful light blue
-                            color: sectionItem.section.wordBalance < 0 ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 228, 0, 1)',
+                            color: annotatorColors.getBalanceColor(sectionItem.section.wordBalance),
                             // top, right, bottom, left
                             margin: '0 0 0 20px',
 
@@ -140,7 +152,7 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
     }
 
     // subscribe to writing plan status
-    writingPlanStatus.listener.event((status: WritingPlanStatus) => {
+    writingPlanInstance.writingPlanStatus.listener.event((status: WritingPlanStatus) => {
         switch (status) {
             case WritingPlanStatus.refreshed:
                 triggerUpdateDecorations(true);

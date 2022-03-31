@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { WritingPlan } from 'writing-plan';
 import { updateStatusBarText as updatePlanStatusBarText } from './writing-plan-bar';
-import { getCurrentPlan, refreshCurrentPlan, writingPlans } from './writing-plan-instance';
+import { writingPlanInstance } from './writing-plan-instance';
 
 
 let changeTimeout: NodeJS.Timeout | null;
@@ -22,9 +22,8 @@ export const documentPlanListener = (event: vscode.TextDocumentChangeEvent) => {
             let docText = vscode.window.activeTextEditor?.document.getText() ?? null;
 
             if (docText !== null) {
-                refreshCurrentPlan(docText);
+                writingPlanInstance.refreshCurrentPlan(docText);
 
-                console.log("checked", getCurrentPlan());
                 updatePlanStatusBarText();
             }
         }

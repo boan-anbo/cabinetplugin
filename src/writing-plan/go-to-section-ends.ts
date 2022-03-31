@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Section } from 'writing-plan/build/main/lib/section';
 import { goToLine } from './go-to-line';
-import { getCurrentPlan } from './writing-plan-instance';
+import { writingPlanInstance } from './writing-plan-instance';
 
 export const jumpToCursorSectionBeginning = async () => {
     // get the active editor and cursor and check if the section it is in
@@ -21,7 +21,7 @@ export const jumpToCursorSectionBeginning = async () => {
 export const getWrappingSectionByCursorPosition = (cursor: vscode.Position, excludingMarkers: boolean = false): Section | null => {
     const cursorLine = cursor.line;
     const cursorIndex = cursor.character;
-    const sectionIn = getCurrentPlan()?.getSectionByLineAndIndex(cursorLine, cursorIndex);
+    const sectionIn = writingPlanInstance.getCurrentPlan()?.getSectionByLineAndIndex(cursorLine, cursorIndex);
     if (sectionIn && excludingMarkers) {
         if (sectionIn.markerOpenLine === cursorLine && cursorIndex >= sectionIn.markerOpenStartIndex && cursorIndex <= sectionIn.markerOpenEndIndex) {
             return null;

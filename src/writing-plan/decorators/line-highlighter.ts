@@ -8,7 +8,13 @@ export const highlightLines = (beginLine: number, beginIndex: number, endLine: n
     if (activeEditor) {
         const range = new Range(new Position(beginLine + 1, beginIndex), new Position(endLine - 1, endIndex));
         currentHighlight = window.createTextEditorDecorationType({
-            backgroundColor: 'rgba(251, 255, 225, 0.3)',
+
+            // the background color for light should have more color
+            light: { backgroundColor: 'rgba(251, 255, 225, 0.4)' },
+            // the background color for dark should have less color otherwise the contrast will be too low
+            dark: {
+                backgroundColor: 'rgba(251, 255, 225, 0.1)',
+            },
             // otherwise only words will be highlighted
             isWholeLine: true,
         }), [range];
@@ -24,8 +30,8 @@ export const highlightMarker = (range: Range) => {
         currentMarkerHighlight = window.createTextEditorDecorationType({
             // highlight the marker
             backgroundColor: 'rgba(0, 255, 0, 0.2)',
-            // set font dark gray
-            color: 'rgba(0, 0, 0, 0.5)',
+            borderRadius: '2px',
+            fontWeight: 'bold',
             // otherwise only words will be highlighted
             isWholeLine: false,
         });
