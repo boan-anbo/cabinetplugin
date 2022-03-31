@@ -1,6 +1,6 @@
 import { window, workspace } from "vscode";
 import { updateStatusBarText as updateWritingPlanStatusBarText } from "../../writing-plan/writing-plan-bar";
-import { refreshCurrentPlan, writingPlanStatus } from "../../writing-plan/writing-plan-instance";
+import { refreshCurrentPlan, WritingPlanStatus, writingPlanStatus } from "../../writing-plan/writing-plan-instance";
 
 export const toggleWritingPlan = () => {
     // get properity to check if the writing plan is enabled
@@ -11,5 +11,7 @@ export const toggleWritingPlan = () => {
     updateWritingPlanStatusBarText();
     if (writingPlanStatus.enabled) {
         refreshCurrentPlan();
+    } else {
+        writingPlanStatus.listener.fire(WritingPlanStatus.shutdown);
     }
-}
+};

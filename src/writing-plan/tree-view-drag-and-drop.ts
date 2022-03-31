@@ -1,14 +1,15 @@
 import * as vscode from 'vscode';
 import { CardTreeItem, SectionTreeItem, WritingPlanTreeItem } from './entities/section-item';
 import { InsertRelation, moveSections } from './utils/move-sections';
-import { getCurrentPlan, refreshCurrentPlan } from './writing-plan-instance';
+import { allCurrentSectionItems, getCurrentPlan, refreshCurrentPlan, writingPlanStatus, WritingPlanStatus } from './writing-plan-instance';
 
-export class TestViewDragAndDrop implements vscode.TreeDataProvider<WritingPlanTreeItem> {
+export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPlanTreeItem> {
 
     private _onDidChangeTreeData: vscode.EventEmitter<WritingPlanTreeItem[] | undefined> = new vscode.EventEmitter<WritingPlanTreeItem[] | undefined>();
     // We want to use an array as the event type, but the API for this is currently being finalized. Until it's finalized, use any.
     public onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
     // Keep track of any SectionItems we create so that we can re-use the same objects.
+    treeView: vscode.TreeView<WritingPlanTreeItem>;
 
     constructor(context: vscode.ExtensionContext) {
 
@@ -16,13 +17,32 @@ export class TestViewDragAndDrop implements vscode.TreeDataProvider<WritingPlanT
             treeDataProvider: this,
             showCollapseAll: true,
             canSelectMany: true,
+
             // dragAndDropController: this 
         });
         context.subscriptions.push(view);
         vscode.commands.registerCommand("writing-plan.outline.refresh", () =>
             this.refresh()
         );
+
+        this.treeView = view;
+
+        writingPlanStatus.listener.event(this.writingPlanStatusHandler);
     }
+
+    writingPlanStatusHandler(status: WritingPlanStatus): void {
+        console.log('writing plan status changed, tree items:', this.getChildren());
+        switch (status) {
+            case WritingPlanStatus.refreshed:
+                this.refresh();
+                break;
+            case WritingPlanStatus.shutdown:
+                this.refresh();
+                break;
+        }
+    }
+
+
 
     // Tree data provider 
     public getChildren(sectionItem?: WritingPlanTreeItem): WritingPlanTreeItem[] {
@@ -34,42 +54,32 @@ export class TestViewDragAndDrop implements vscode.TreeDataProvider<WritingPlanT
 
     }
 
+
     refresh(): void {
         console.log('refreshing')
         this._onDidChangeTreeData.fire(undefined);
     }
 
-    public getTreeItem(element: WritingPlanTreeItem): vscode.TreeItem {
+    public getTreeItem(element: WritingPlanTreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
         return element;
     }
 
-    public getParent(element: WritingPlanTreeItem): WritingPlanTreeItem | null {
+    getParent(element: WritingPlanTreeItem): WritingPlanTreeItem | null {
         return getSectionItemParent(element);
     }
+    // getParent() {
+    //     return null;
+    // }
+
+    // public getParent(element: WritingPlanTreeItem): WritingPlanTreeItem | null {
+    //     return getSectionItemParent(element);
+    // }
+
 
     dispose(): void {
         // nothing to dispose
+        this.treeView.dispose();
     }
-
-    // Drag and drop controller
-
-    // public async handleDrop(sources: any, target: SectionItem, token: vscode.CancellationToken) {
-    //     const transferItem = sources.get('application/vnd.code.tree.testViewDragAndDrop');
-    //     console.log('target', target);
-    //     console.log('sources', transferItem);
-    //     if (!transferItem) {
-    //         return;
-    //     }
-    // }
-
-    // public async handleDrag(source: SectionItem[], treeDataTransfer: vscode.DataTransfer, token: vscode.CancellationToken)
-    // // Thenable<TreeDataTransfer<TreeDataTransferItem>>
-    // {
-    //     // const transfer = new TreeDataTransfer<TreeDataTransferItem>();
-    //     treeDataTransfer.set('application/vnd.code.tree.testViewDragAndDrop', new vscode.DataTransferItem(source));
-    //     console.log('dragging', transfer);
-    //     // return Promise.resolve(transfer);
-    // }
 
     moveSectionUp = async (sectionItem: SectionTreeItem) => {
         const currentPlan = getCurrentPlan();
@@ -81,7 +91,6 @@ export class TestViewDragAndDrop implements vscode.TreeDataProvider<WritingPlanT
         if (sectionToMoveTo) {
             await moveSections(sectionToMove, sectionToMoveTo, InsertRelation.Before);
             refreshCurrentPlan();
-            this.refresh();
         } else {
             // console.log('Section already on top');
             // show information message
@@ -99,7 +108,6 @@ export class TestViewDragAndDrop implements vscode.TreeDataProvider<WritingPlanT
         if (sectionToMoveTo) {
             await moveSections(sectionToMove, sectionToMoveTo, InsertRelation.After);
             refreshCurrentPlan();
-            this.refresh();
         } else {
             // console.log('Section already on top');
             // show information message
@@ -117,9 +125,9 @@ const getSectionItemParent = (sectionItem: WritingPlanTreeItem): WritingPlanTree
     }
     if (sectionItem instanceof SectionTreeItem) {
 
-        const section = currentPlan.getParentSection(sectionItem.section.id);
+        const section = allCurrentSectionItems.find(s => s.section.id === sectionItem.section.parentId);
 
-        return section ? SectionTreeItem.fromSection(section) : null;
+        return section ?? null;
     }
 
     return null;
@@ -133,8 +141,8 @@ const getSectionItemChildren = (sectionItem: WritingPlanTreeItem): WritingPlanTr
     const allChildren: WritingPlanTreeItem[] = [];
     if (sectionItem instanceof SectionTreeItem) {
 
-        const section = currentPlan.getSectionChildren(sectionItem.section.id);
-        allChildren.push(...SectionTreeItem.fromSections(section));
+        const sections = allCurrentSectionItems.filter(s => s.section.parentId === sectionItem.section.id);
+        allChildren.push(...sections);
 
         if (sectionItem.hasCards) {
             allChildren.push(...sectionItem.cardItems);
@@ -150,5 +158,8 @@ const getRootSectionItems = (): WritingPlanTreeItem[] => {
         return [];
     }
     // I need to convert all sections to section items first so that I can calculate cards among them, such as adding children section's cards to parent sections. And then filter out the children. This might be expensive, and could be optimized later.
-    return SectionTreeItem.fromSections(currentPlan.sections).filter(sectionItem => sectionItem.section.parentId === null);
+    return allCurrentSectionItems.filter(sectionItem => sectionItem.section.parentId === null);
 };
+
+
+

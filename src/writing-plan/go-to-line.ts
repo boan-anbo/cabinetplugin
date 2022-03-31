@@ -1,4 +1,4 @@
-import { Position, Range, Selection, window, workspace } from "vscode";
+import { Position, Range, Selection, TextEditorRevealType, window, workspace } from "vscode";
 
 export async function goToLine(line: number, index?: number, documentUri?: string) {
 
@@ -22,7 +22,7 @@ export async function goToLine(line: number, index?: number, documentUri?: strin
 
         const position = new Position(line, index ?? 0);
         editor.selection = new Selection(position, position);
-        editor.revealRange(new Range(position, position));
+        editor.revealRange(new Range(position, position), TextEditorRevealType.InCenter);
     }
     return;
 }
