@@ -1,11 +1,14 @@
 import * as vscode from 'vscode';
-import { getCurrentPlan, writingPlans, writingPlanStatus } from './writing-plan-instance';
+import { writingPlanInstance } from './writing-plan-instance';
 
 
 let writingPlanBarItem: vscode.StatusBarItem;
 
 export const createStatusBar = () => {
     writingPlanBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 200);
+    // get properity to check if the writing plan is enabled
+    const writingPlanEnabled = vscode.workspace.getConfiguration('cabinetplugin.writing-plan').get('enable') as boolean;
+    writingPlanInstance.writingPlanStatus.enabled = writingPlanEnabled;
     writingPlanBarItem.command = toggleWritingPlanBarCommand;
 
     updateStatusBarText();
@@ -16,12 +19,12 @@ export const createStatusBar = () => {
 
 const toggleWritingPlanBarCommand: vscode.Command = {
     command: 'cabinetplugin.writing-plan.toggle',
-    title: writingPlanStatus.enabled ? 'Turn off Writing Plan' : 'Turn on Writing Plan',
+    title: writingPlanInstance.writingPlanStatus.enabled ? 'Turn off Writing Plan' : 'Turn on Writing Plan',
     tooltip: 'Toggle Writing Plan',
 }
 
 export const updateStatusBarText = (newStatus?: string): void => {
-    if (!writingPlanStatus.enabled) {
+    if (!writingPlanInstance.writingPlanStatus.enabled) {
         writingPlanBarItem.text = '$(eye-closed) Writing Plan';
         writingPlanBarItem.tooltip = 'Writing Plan is disabled';
         return;
@@ -32,7 +35,7 @@ export const updateStatusBarText = (newStatus?: string): void => {
     }
 
     if (!newStatus) {
-        newStatus = getCurrentPlan()?.toString();
+        newStatus = writingPlanInstance.getCurrentPlan()?.toString();
         if (!newStatus) {
             newStatus = "No Writing Plan";
         }

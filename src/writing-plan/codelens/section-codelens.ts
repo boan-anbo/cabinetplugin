@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { WritingPlan } from 'writing-plan';
 import { WritingPlanOptions } from 'writing-plan/build/main/lib/entities/writing-plan-options';
-import { allCurrentSectionItems, getCurrentPlan, getSectionByRange, getSectionParent, writingPlans } from '../writing-plan-instance';
+import { writingPlanInstance } from '../writing-plan-instance';
 import { getNavigationCodeLenses } from './get-section-navigation-lenses';
 
 
@@ -30,7 +30,7 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
             const regex = new RegExp(this.regex);
             const text = document.getText();
             let matches;
-            const plan = getCurrentPlan();
+            const plan = writingPlanInstance.getCurrentPlan();
             if (!plan) {
                 return [];
             }
@@ -42,37 +42,27 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
 
                 if (range) {
 
-                    const section = getSectionByRange(range);
+                    const section = writingPlanInstance.getSectionByRange(range);
                     if (!section) {
                         return [];
                     }
-
                     // get text at range
                     const marker = document.getText(range);
                     const isCloseMarker = plan.isCloseMarker(marker);
 
-                    // section header = 
-                    // generate header with #
-                    // const header = Array.from({ length: section.level + 1 }, (x, i) => i).map(i => '#').join('');
-                    // this.codeLenses.push(new vscode.CodeLens(range, {
-                    //     title: `${isCloseMarker ? '<' : '>'} ${header} [${section.order + 1}]`,
-                    //     tooltip: '',
-                    //     command: '',
-                    // }));
-
-
-                    const sectionItem = allCurrentSectionItems.find(item => item.section.id === section.id);
-
+                    const sectionItem = writingPlanInstance.allCurrentSectionItems.find(item => item.section.id === section.id);
                     const prefixIndentLength = sectionItem?.sectionLevelOrderString.length ?? 0;
-
                     const adjustedRange = new vscode.Range(
                         new vscode.Position(range.start.line, range.start.character + prefixIndentLength),
                         new vscode.Position(range.end.line, range.end.line === range.start.line ? range.end.character + prefixIndentLength : range.end.character)
                     );
+
                     // if it's open marker, add a button to jump to end
+
+                    const jumpLabel = ` ${section.title ? section.title : section.wordTargetActual} `;
                     if (!isCloseMarker) {
                         this.codeLenses.push(new vscode.CodeLens(adjustedRange, {
-                            title: ` ▼ `,
+                            title: jumpLabel + ` ▼ `,
                             tooltip: `Jump to close marker`,
                             command: 'cabinetplugin.writing-plan.goToLine',
                             arguments: [
@@ -81,22 +71,21 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
                         }));
                     } else {
                         this.codeLenses.push(new vscode.CodeLens(adjustedRange, {
-                            title: ` ▲ `,
+                            title: jumpLabel + ` ▲ `,
                             tooltip: `Go to open marker`,
                             command: 'cabinetplugin.writing-plan.goToLine',
                             arguments: [
                                 section?.markerOpenLine,
+                                section?.markerOpenEndIndex + 1,
                             ]
                         }));
                     }
 
-
                     // give navigation buttons only to open markers to lessen visual pollution. The close marker can be used to jump to the beginning to use the navigation buttons
-                    if (!isCloseMarker) {
-                        const navigationLenses = getNavigationCodeLenses(range, section);
-                        this.codeLenses.push(...navigationLenses);
-                    }
-                    // this.codeLenses.push(new vscode.CodeLens(range));
+                    // if (!isCloseMarker) {
+                    const navigationLenses = getNavigationCodeLenses(range, section);
+                    this.codeLenses.push(...navigationLenses);
+
                 }
             }
             return this.codeLenses;
@@ -107,7 +96,7 @@ export class SectionCodeLensProvider implements vscode.CodeLensProvider {
     public async resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
         const editor = vscode.window.activeTextEditor;
 
-        const section = getSectionByRange(codeLens.range);
+        const section = writingPlanInstance.getSectionByRange(codeLens.range);
 
         // this is taken over by annotator
         // if (editor && section) {

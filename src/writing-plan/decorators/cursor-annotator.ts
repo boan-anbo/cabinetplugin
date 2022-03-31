@@ -3,7 +3,8 @@ import { Section } from "writing-plan/build/main/lib/section";
 import { SectionTreeItem } from "../entities/section-item";
 import { getWrappingSectionByCursorPosition } from "../go-to-section-ends";
 import { writingPlanTreeView } from "../register-writing-plan";
-import { allCurrentSectionItems } from "../writing-plan-instance";
+import { writingPlanInstance, WritingPlanStatus } from "../writing-plan-instance";
+import { annotatorColors } from "./annotator-colors";
 
 export const registerCursorDecorations = (context: ExtensionContext) => {
 
@@ -34,7 +35,7 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
                     after: {
                         contentText: `${sectionItem.description}`,
                         // if balance is negative, it will be pink color, if positive, it will be green color
-                        color: sectionItem.section.wordBalance < 0 ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 228, 0, 1)',
+                        color: annotatorColors.getBalanceColor(sectionItem.section.wordBalance),
                         // top, right, bottom, left
                         margin: '0 0 0 20px',
                         // set smaller css font size
@@ -70,23 +71,24 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
         }
     }
 
-    window.onDidChangeTextEditorSelection((event: TextEditorSelectionChangeEvent) => {
-        const cursorPosition: Position = event.selections[0]?.active;
+
+    function updateCursorAnnotation(cursorPosition: Position) {
+        clearDecoration();
         // get the content of line at the cursor position
-        const lineContent = event.textEditor.document.lineAt(cursorPosition.line);
+        const lineContent = window.activeTextEditor?.document.lineAt(cursorPosition.line);
         const sectionIn = getWrappingSectionByCursorPosition(cursorPosition, true);
 
 
         const isOnTheSameLineAsSectionMarker = (cursorPosition.line === sectionIn?.markerOpenLine || cursorPosition.line === sectionIn?.markerCloseLine);
 
-        if (cursorPosition && sectionIn && !isOnTheSameLineAsSectionMarker) {
+        if (cursorPosition && lineContent && sectionIn && !isOnTheSameLineAsSectionMarker) {
             const endOfLine = lineContent.text.length;
             triggerUpdateDecorations(sectionIn, cursorPosition, endOfLine);
 
             // highlight the current section in treeview writing plan outline
             if (writingPlanTreeView && sectionIn) {
                 // get section item from the tree view that includes the sectionIn
-                const sectionItem = allCurrentSectionItems.find(item => item.section.id === sectionIn.id);
+                const sectionItem = writingPlanInstance.allCurrentSectionItems.find(item => item.section.id === sectionIn.id);
                 console.log('Highlighting', sectionIn, sectionItem);
                 // suppress typescript warning
 
@@ -95,11 +97,23 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
                 }
 
             }
-        } else {
-            clearDecoration();
-        };
+        }
+    }
+
+    window.onDidChangeTextEditorSelection((event: TextEditorSelectionChangeEvent) => {
+        const cursorPosition: Position = event.selections[0]?.active;
+        updateCursorAnnotation(cursorPosition);
     }, null, context.subscriptions);
 
+
+    writingPlanInstance.writingPlanStatus.listener.event(() => {
+        // get current cursor position
+        const cursorPosition = window.activeTextEditor?.selection.active;
+        if (cursorPosition) {
+            updateCursorAnnotation(cursorPosition);
+        }
+
+    });
     function dispose() {
         cursorDecorationType.dispose();
     }

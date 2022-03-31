@@ -1,11 +1,11 @@
 import { CodeLens, Range } from "vscode";
 import { Section } from "writing-plan/build/main/lib/section";
-import { getCurrentPlan, getSectionParent } from "../writing-plan-instance";
+import { writingPlanInstance } from "../writing-plan-instance";
 
 export const getNavigationCodeLenses = (range: Range, section: Section): CodeLens[] => {
 
     const lenses: CodeLens[] = [];
-    const plan = getCurrentPlan();
+    const plan = writingPlanInstance.getCurrentPlan();
 
     if (!plan) {
         return [];

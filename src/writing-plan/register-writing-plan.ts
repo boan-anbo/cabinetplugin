@@ -3,7 +3,6 @@ import { WritingPlan } from 'writing-plan';
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { sectionCodeLensProvider } from './codelens/section-codelens';
-import { getCurrentPlan, refreshCurrentPlan, writingPlans } from './writing-plan-instance';
 import { documentPlanListener } from './plan-listener';
 import { createStatusBar } from './writing-plan-bar';
 import { goToLine } from './go-to-line';
@@ -13,9 +12,11 @@ import { registerSectionDecorations } from './decorators/section-annotator';
 import { registerCursorDecorations } from './decorators/cursor-annotator';
 import { copySkeletonPlanToVscodeClipboard, writeSkeletonCopyIntoNewFile } from './commands/get-skeleton-copy';
 import { WritingPlanTreeItem } from './entities/section-item';
+import { writingPlanInstance } from './writing-plan-instance';
 
 export let writingPlanTreeView: WritingPlanOutlineTree | undefined = undefined;
 
+export const globalWritingPlanDisposables: vscode.Disposable[] = [];
 export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 
 	const goToLineCommandSub = vscode.commands.registerCommand("cabinetplugin.writing-plan.goToLine", goToLine);
@@ -29,7 +30,7 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 	// attach a listener to watch cursor position changes
 	context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(cursorChangeHighlightListener));
 
-	refreshCurrentPlan();
+	writingPlanInstance.refreshCurrentPlan();
 
 	createStatusBar();
 
@@ -55,4 +56,6 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 	registerCursorDecorations(context);
 
 	console.log('Writing Plan Inititated');
+
+	context.subscriptions.push(...globalWritingPlanDisposables);
 };
