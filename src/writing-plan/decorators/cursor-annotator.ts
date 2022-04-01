@@ -24,9 +24,6 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
                 return;
             }
             const sectionDecorationOptions: DecorationOptions[] = [];
-            // const decoration = { range: new Range(startPos, endPos), hoverMessage: 'Number **' + match[0] + '**' };
-            const mainColor = 'rgba(0, 0, 0, 0.3)';
-
             const decorationOption = {
                 // get line content length of the cursor position
 
@@ -36,6 +33,7 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
                         contentText: `${sectionItem.description}`,
                         // if balance is negative, it will be pink color, if positive, it will be green color
                         color: annotatorColors.getBalanceColor(sectionItem.section.wordBalance),
+
                         // top, right, bottom, left
                         margin: '0 0 0 20px',
                         // set smaller css font size
@@ -93,7 +91,12 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
                 // suppress typescript warning
 
                 if (sectionItem) {
-                    writingPlanTreeView.treeView.reveal(sectionItem);
+                    // check is writing plan tree view is visible
+                    if (writingPlanTreeView.treeView.visible) {
+                        // select the section item in the tree view
+                        writingPlanTreeView.treeView.reveal(sectionItem);
+                    }
+
                 }
 
             }
