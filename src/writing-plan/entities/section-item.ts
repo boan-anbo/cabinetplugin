@@ -1,4 +1,5 @@
-import { Card } from "cabinet-node";
+import { Card, CardWithLine } from "cabinet-node";
+import { Line } from "cabinet-node/build/main/lib/line";
 import path = require("path");
 import { v4 } from "uuid";
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
@@ -37,18 +38,16 @@ export class SectionTreeItem extends WritingPlanTreeItem {
         // set section order string
         this.sectionLevelOrderString = `${arabic2roman(section?.level, 1)}.${arabic2roman(section?.levelOrder, 1)}`;
 
-        const cardItems = [];
         if (cabinetNodeInstance) {
-            const cards = cabinetNodeInstance.getAllCardsByCciFromText(section.content);
+            const cards = cabinetNodeInstance.getAllCardsByCciWithLineFromText(section.content);
             if (cards) {
 
-                cardItems.push(...CardTreeItem.fromCards(cards));
+                this.cardItems.push(...CardTreeItem.fromCardsWithLine(cards));
             }
         }
 
 
         // store card items under section items
-        this.cardItems = cardItems;
 
 
         this.section = section;
@@ -111,17 +110,33 @@ export class SectionTreeItem extends WritingPlanTreeItem {
 }
 export class CardTreeItem extends WritingPlanTreeItem {
     itemType: WritingPlanItemType = WritingPlanItemType.Card;
-    card: Card
-    constructor(card: Card) {
+    card: Card;
+    line?: Line;
+    constructor(card: Card, line?: Line) {
         super(card.title ?? 'Card', TreeItemCollapsibleState.None);
         this.card = card;
         this.tooltip = card.title ?? card.source?.fileName ?? 'Card';
         this.description = card.toMarkdown();
+        this.line = line;
 
+        if (this.line) {
+            // jump to the line as command
+            this.command = {
+                title: 'Jump to section',
+                command: 'cabinetplugin.writing-plan.goToLine',
+                arguments: [
+                    this.line.line ?? 0,
+                ]
+            };
+        }
     }
 
     static fromCards(cards: Card[]): CardTreeItem[] {
         return cards.map(card => new CardTreeItem(card));
+    }
+
+    static fromCardsWithLine(cards: CardWithLine[]): CardTreeItem[] {
+        return cards.map(card => new CardTreeItem(card.card, card.line));
     }
 
     iconPath = {

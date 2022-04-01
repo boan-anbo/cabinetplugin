@@ -34,7 +34,7 @@ export class WritingPlanInstance implements Disposable {
 
     defaultWritingPlanOptions: WritingPlanOptions = new WritingPlanOptions(
         {
-            excludedContentPatterns: new Set(['{{.*?}}']),
+            excludedStatsPatterns: new Set(['{{.*?}}']),
         }
 
     );
