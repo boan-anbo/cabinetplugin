@@ -136,7 +136,7 @@ export class CardTreeItem extends WritingPlanTreeItem {
     }
 
     static fromCardsWithLine(cards: CardWithLine[]): CardTreeItem[] {
-        return cards.map(card => new CardTreeItem(card.card, card.line));
+        return cards.map(card => new CardTreeItem(card.card, card.start.line));
     }
 
     iconPath = {
