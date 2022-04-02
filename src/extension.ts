@@ -159,10 +159,6 @@ export async function activate(context: vscode.ExtensionContext) {
 				treeDataProvider: cabinetNodeOutlineProvider
 			});
 
-			vscode.window.createTreeView('nodeDependencies', {
-				treeDataProvider: new CabinetNotesProvider()
-
-			});
 
 
 			const goToLineCommandSub = vscode.commands.registerCommand("cabinetOutline.goToLine", goToLine);

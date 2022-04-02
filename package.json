@@ -39,12 +39,6 @@
           "name": "Writing Plan Outline"
         }
       ],
-      "cabinetContainer": [
-        {
-          "id": "nodeDependencies",
-          "name": "Cabinet Outline"
-        }
-      ],
       "explorer": [
         {
           "id": "cabinetOutline",
@@ -68,6 +62,11 @@
         {
           "command": "cabinetOutline.refresh",
           "when": "view == cabinetOutline",
+          "group": "navigation"
+        },
+        {
+          "command": "writing-plan.outline.toggleCards",
+          "when": "view == writing-outline && config.cabinetplugin.writing-plan.outline.showCards",
           "group": "navigation"
         }
       ],
@@ -113,6 +112,24 @@
       }
     ],
     "commands": [
+      {
+        "command": "writing-plan.outline.toggleCards",
+        "title": "Toggle Cards",
+        "icon": {
+          "light": "media/card-item.svg",
+          "dark": "media/card-item.svg"
+        }
+      },
+      {
+        "command": "writing-plan.commentAllSectionMarkers",
+        "title": "Comment All Section Markers",
+        "category": "Writing Plan"
+      },
+      {
+        "command": "writing-plan.uncommentAllSectionMarkers",
+        "title": "Uncomment All Section Markers",
+        "category": "Writing Plan"
+      },
       {
         "command": "cabinetplugin.startCabinet",
         "title": "Start",
@@ -242,6 +259,11 @@
     "configuration": {
       "title": "Cabinet",
       "properties": {
+        "cabinetplugin.writing-plan.outline.showCards": {
+          "description": "Show Cards on Writing Plan Outline",
+          "type": "boolean",
+          "default": true
+        },
         "cabinetplugin.writing-plan.enable": {
           "type": "boolean",
           "description": "Enable Writing Plan",

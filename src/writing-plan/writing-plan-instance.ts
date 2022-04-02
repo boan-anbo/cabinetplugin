@@ -1,9 +1,10 @@
-import { commands, Disposable, EventEmitter, Range, window } from "vscode";
+import { commands, Disposable, EventEmitter, Range, Selection, window } from "vscode";
 import { SectionTreeParseError, WritingPlan } from "writing-plan";
 import { WritingPlanOptions } from "writing-plan/build/main/lib/entities/writing-plan-options";
 import { Section } from "writing-plan/build/main/lib/section";
 import { SectionTreeItem } from "./entities/section-item";
 import { globalWritingPlanDisposables } from "./register-writing-plan";
+import { unselectAll } from "./utils/unselect-all";
 
 export class WritingPlanInstance implements Disposable {
 
@@ -16,6 +17,50 @@ export class WritingPlanInstance implements Disposable {
         this._allCurrentSectionItems = value ?? [];
     };
 
+    async commentAllSectionMarkers() {
+        const plan = this.getCurrentPlan();
+        if (!plan) {
+            return;
+        }
+        // use vscode api to comment a line
+        const lines: number[] = plan.sections.flatMap(section => [section.markerOpenLine, section.markerCloseLine]);
+        // select all the lines
+
+        if (lines) {
+            const ranges = lines.map(line => new Range(line, 0, line, 0));
+            ranges.forEach(range => {
+                // check if the line has been commented
+            })
+            const editor = window.activeTextEditor;
+            if (editor) {
+                editor.selections = ranges.map(range => new Selection(range.start, range.end));
+                // comment the lines
+                await commands.executeCommand('editor.action.commentLine');
+                // cancel vs code multi-cursor selection
+                unselectAll();
+
+            }
+        }
+    }
+
+    uncommentAllSectionMarkers() {
+        const plan = this.getCurrentPlan();
+        if (!plan) {
+            return;
+        }
+        // use vscode api to comment a line
+        const lines: number[] = plan.sections.flatMap(section => [section.markerOpenLine, section.markerCloseLine]);
+        // select all the lines
+        if (lines) {
+            const ranges = lines.map(line => new Range(line, 0, line, 0));
+            const editor = window.activeTextEditor;
+            if (editor) {
+                editor.selections = ranges.map(range => new Selection(range.start, range.end));
+                // comment the lines
+                commands.executeCommand('editor.action.removeCommentLine');
+            }
+        }
+    }
 
     constructor(writingPlanOptions?: WritingPlanOptions) {
         writingPlanOptions ? this.defaultWritingPlanOptions = writingPlanOptions : null;

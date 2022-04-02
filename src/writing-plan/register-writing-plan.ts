@@ -7,12 +7,13 @@ import { documentPlanListener } from './plan-listener';
 import { createStatusBar } from './writing-plan-bar';
 import { goToLine } from './go-to-line';
 import { cursorChangeHighlightListener } from './cursor-change-listener';
-import { WritingPlanOutlineTree } from './tree-view-drag-and-drop';
+import { WritingPlanOutlineTree } from './writing-plan-outline/tree-view-drag-and-drop';
 import { registerSectionDecorations } from './decorators/section-annotator';
 import { registerCursorDecorations } from './decorators/cursor-annotator';
 import { copySkeletonPlanToVscodeClipboard, writeSkeletonCopyIntoNewFile } from './commands/get-skeleton-copy';
 import { WritingPlanTreeItem } from './entities/section-item';
 import { writingPlanInstance } from './writing-plan-instance';
+import { toggleOutlineShowCards } from './writing-plan-outline/toggle-outline-show-cards';
 
 export let writingPlanTreeView: WritingPlanOutlineTree | undefined = undefined;
 
@@ -36,7 +37,7 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 
 
 
-
+	const disposables: vscode.Disposable[] = [];
 	writingPlanTreeView = new WritingPlanOutlineTree(context);
 
 	if (writingPlanTreeView) {
@@ -46,16 +47,29 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 	// create function to reveal the tree view item
 	// register actions for writing plan outline items
 	// register copy skeleton copy command
-	vscode.commands.registerCommand('writing-plan.copySkeleton', copySkeletonPlanToVscodeClipboard);
+	disposables.push(vscode.commands.registerCommand('writing-plan.copySkeleton', copySkeletonPlanToVscodeClipboard));
 	// register write skeleton copy into new file command
-	vscode.commands.registerCommand('writing-plan.writeSkeleton', writeSkeletonCopyIntoNewFile);
+	disposables.push(vscode.commands.registerCommand('writing-plan.writeSkeleton', writeSkeletonCopyIntoNewFile));
+	// register a command to comment all section markers
+	disposables.push(vscode.commands.registerCommand('writing-plan.commentAllSectionMarkers', async () => {
+		await writingPlanInstance.commentAllSectionMarkers();
+	}));
+	// register a command to uncomment all section markers
+	disposables.push(vscode.commands.registerCommand('writing-plan.uncommentAllSectionMarkers', () => {
+		writingPlanInstance.uncommentAllSectionMarkers();
+	}));
+	// register toggle cards on outline
+	disposables.push(vscode.commands.registerCommand('writing-plan.outline.toggleCards', toggleOutlineShowCards));
 
 	// register section decorators
 	registerSectionDecorations(context);
 	// registor cursor decorators
 	registerCursorDecorations(context);
+	// 
 
 	console.log('Writing Plan Inititated');
+
+	context.subscriptions.push(...disposables);
 
 	context.subscriptions.push(...globalWritingPlanDisposables);
 };

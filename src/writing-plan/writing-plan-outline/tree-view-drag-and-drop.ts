@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { CardTreeItem, SectionTreeItem, WritingPlanTreeItem } from './entities/section-item';
-import { InsertRelation, moveSections } from './utils/move-sections';
-import { writingPlanInstance, WritingPlanStatus } from './writing-plan-instance';
+import { CardTreeItem, SectionTreeItem, WritingPlanTreeItem } from '../entities/section-item';
+import { InsertRelation, moveSections } from '../utils/move-sections';
+import { writingPlanInstance, WritingPlanStatus } from '../writing-plan-instance';
 
 export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPlanTreeItem> {
 
@@ -10,6 +10,7 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
     public onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
     // Keep track of any SectionItems we create so that we can re-use the same objects.
     treeView: vscode.TreeView<WritingPlanTreeItem>;
+    showCards = true;
 
     constructor(context: vscode.ExtensionContext) {
 
@@ -49,7 +50,7 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
     // Tree data provider 
     public getChildren(sectionItem?: WritingPlanTreeItem): WritingPlanTreeItem[] {
         if (sectionItem) {
-            return getSectionItemChildren(sectionItem);
+            return getSectionItemChildren(sectionItem, this.showCards);
         } else {
             return getRootSectionItems();
         }
@@ -135,7 +136,7 @@ const getSectionItemParent = (sectionItem: WritingPlanTreeItem): WritingPlanTree
     return null;
 };
 
-const getSectionItemChildren = (sectionItem: WritingPlanTreeItem): WritingPlanTreeItem[] => {
+const getSectionItemChildren = (sectionItem: WritingPlanTreeItem, showCards: boolean): WritingPlanTreeItem[] => {
     const currentPlan = writingPlanInstance.getCurrentPlan();
     if (currentPlan === null) {
         return [];
@@ -146,7 +147,7 @@ const getSectionItemChildren = (sectionItem: WritingPlanTreeItem): WritingPlanTr
         const childrenSections = writingPlanInstance.allCurrentSectionItems.filter(s => s.section.parentId === sectionItem.section.id);
         allChildren.push(...childrenSections);
 
-        if (sectionItem.hasCards) {
+        if (sectionItem.hasCards && showCards) {
             allChildren.push(...sectionItem.cardItems);
         }
     }

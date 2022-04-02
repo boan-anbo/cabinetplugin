@@ -19,7 +19,7 @@ export abstract class WritingPlanTreeItem extends TreeItem {
 export class SectionTreeItem extends WritingPlanTreeItem {
     id: string = v4();
     section: Section;
-    contextValue: 'root' | 'child';
+    contextValue = 'section';
     cardItems: CardTreeItem[] = [];
     hasCards: boolean;
     cardsNum: number;
@@ -53,7 +53,7 @@ export class SectionTreeItem extends WritingPlanTreeItem {
         this.section = section;
 
         this.tooltip = section.wordCount.toString();
-        this.description = `${section.title ? `"${section.title.trim()}": ` : ''} W: ${section?.wordCount} | S: ${section?.wordCountSelf} | B: ${section.wordBalance} | T: ${section?.wordTargetNominal} ${section.isSectionTargetOverflown ? `+ ${section.wordTargetOverflow}` : ''}`;
+        this.description = `${section.title ? `"${section.title.trim()}": ` : ''} T: ${section?.wordTargetNominal} ${section.isSectionTargetOverflown ? `+ ${section.wordTargetOverflow}` : ''} | B: ${section.wordBalance > 0 ? '+' : ''}${section.wordBalance} | W: ${section?.wordCount} `;
 
         if (section.parentId === null) {
             this.contextValue = 'root';
@@ -118,6 +118,7 @@ export class CardTreeItem extends WritingPlanTreeItem {
         this.tooltip = card.title ?? card.source?.fileName ?? 'Card';
         this.description = card.toMarkdown();
         this.line = line;
+        this.contextValue = 'card';
 
         if (this.line) {
             // jump to the line as command
