@@ -10,6 +10,8 @@ import { getAllCardPlaces, getCurrentlyUsedCards } from '../utils/get-current_ca
 import { goToLine } from '../commands/go-to-line-command';
 import { CardPlace } from '../types/card-place';
 import { cabinetNodeInstance } from '../../extension';
+import { writingPlanInstance } from '../../writing-plan/writing-plan-instance';
+import { WritingPlan } from 'writing-plan';
 
 export const showPreviewCommand = (cabinetInstance: CabinetNode) => vscode.commands.registerCommand('cabinetplugin.showPreview', async () => {
 
@@ -23,10 +25,17 @@ export const showPreviewCommand = (cabinetInstance: CabinetNode) => vscode.comma
         // Get the document text
         const documentType = editor.document.languageId;
         if (documentType === 'markdown') {
-            const documentText = editor.document.getText();
+            let documentText = editor.document.getText();
 
             const collapsablePreview = (vscode.workspace.getConfiguration('cabinetplugin').get('collapsablePreview') ?? true) as boolean;
             const previewInBlockquote = (vscode.workspace.getConfiguration('cabinetplugin').get('previewInBlockquote') ?? true) as boolean;
+
+            // check if writing plan is enabled
+            const plan = writingPlanInstance.getCurrentPlan();
+            if (plan) {
+                documentText = plan.outPutMarkdown();
+            }
+
 
             const previewHtml = cabinetInstance.getFullHtmlDraft(documentText, new MarkdownOption({ collapsable: collapsablePreview, blockQuote: previewInBlockquote }));
 
