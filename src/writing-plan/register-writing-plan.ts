@@ -7,13 +7,13 @@ import { documentPlanListener } from './plan-listener';
 import { createStatusBar } from './writing-plan-bar';
 import { goToLine } from './go-to-line';
 import { cursorChangeHighlightListener } from './cursor-change-listener';
-import { WritingPlanOutlineTree } from './writing-plan-outline/tree-view-drag-and-drop';
+import { WritingPlanOutlineTree } from './writing-plan-outline/writing-plan-outline-tree';
 import { registerSectionDecorations } from './decorators/section-annotator';
 import { registerCursorDecorations } from './decorators/cursor-annotator';
 import { copySkeletonPlanToVscodeClipboard, writeSkeletonCopyIntoNewFile } from './commands/get-skeleton-copy';
-import { WritingPlanTreeItem } from './entities/section-item';
+import { WritingPlanTreeItem } from './entities/writing-plan-tree-item';
 import { writingPlanInstance } from './writing-plan-instance';
-import { toggleOutlineShowCards } from './writing-plan-outline/toggle-outline-show-cards';
+import { hideOutlineCards, showOutlineCards, toggleOutlineShowCards } from './writing-plan-outline/toggle-outline-show-cards';
 
 export let writingPlanTreeView: WritingPlanOutlineTree | undefined = undefined;
 
@@ -59,7 +59,8 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 		writingPlanInstance.uncommentAllSectionMarkers();
 	}));
 	// register toggle cards on outline
-	disposables.push(vscode.commands.registerCommand('writing-plan.outline.toggleCards', toggleOutlineShowCards));
+	disposables.push(vscode.commands.registerCommand('writing-plan.outline.showCards', showOutlineCards));
+	disposables.push(vscode.commands.registerCommand('writing-plan.outline.hideCards', hideOutlineCards));
 
 	// register section decorators
 	registerSectionDecorations(context);

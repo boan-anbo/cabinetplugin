@@ -65,7 +65,12 @@
           "group": "navigation"
         },
         {
-          "command": "writing-plan.outline.toggleCards",
+          "command": "writing-plan.outline.showCards",
+          "when": "view == writing-outline && !config.cabinetplugin.writing-plan.outline.showCards",
+          "group": "navigation"
+        },
+        {
+          "command": "writing-plan.outline.hideCards",
           "when": "view == writing-outline && config.cabinetplugin.writing-plan.outline.showCards",
           "group": "navigation"
         }
@@ -113,11 +118,19 @@
     ],
     "commands": [
       {
-        "command": "writing-plan.outline.toggleCards",
-        "title": "Toggle Cards",
+        "command": "writing-plan.outline.hideCards",
+        "title": "Hide Cards",
         "icon": {
           "light": "media/card-item.svg",
           "dark": "media/card-item.svg"
+        }
+      },
+      {
+        "command": "writing-plan.outline.showCards",
+        "title": "Show Cards",
+        "icon": {
+          "light": "media/card-item-dim.svg",
+          "dark": "media/card-item-dim.svg"
         }
       },
       {

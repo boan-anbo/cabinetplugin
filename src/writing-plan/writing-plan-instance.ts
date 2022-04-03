@@ -2,7 +2,7 @@ import { commands, Disposable, EventEmitter, Range, Selection, window } from "vs
 import { SectionTreeParseError, WritingPlan } from "writing-plan";
 import { WritingPlanOptions } from "writing-plan/build/main/lib/entities/writing-plan-options";
 import { Section } from "writing-plan/build/main/lib/section";
-import { SectionTreeItem } from "./entities/section-item";
+import { SectionTreeItem } from "./entities/writing-plan-tree-item";
 import { globalWritingPlanDisposables } from "./register-writing-plan";
 import { unselectAll } from "./utils/unselect-all";
 
@@ -102,8 +102,9 @@ export class WritingPlanInstance implements Disposable {
         if (!this.writingPlanStatus.enabled) {
             return null;
         }
+
         if (this.writingPlans[0] !== null) {
-            return this.writingPlans[0];
+            return this.writingPlans[0] && this.writingPlans[0].hasPlan() ? this.writingPlans[0] : null;
         }
         return null;
     }

@@ -1,6 +1,6 @@
 import { DecorationOptions, ExtensionContext, Position, Range, TextEditorDecorationType, TextEditorSelectionChangeEvent, ThemableDecorationAttachmentRenderOptions, window, workspace } from "vscode";
 import { Section } from "writing-plan/build/main/lib/section";
-import { SectionTreeItem } from "../entities/section-item";
+import { SectionTreeItem } from "../entities/writing-plan-tree-item";
 import { getWrappingSectionByCursorPosition } from "../go-to-section-ends";
 import { writingPlanTreeView } from "../register-writing-plan";
 import { writingPlanInstance, WritingPlanStatus } from "../writing-plan-instance";
@@ -32,7 +32,7 @@ export const registerCursorDecorations = (context: ExtensionContext) => {
                     after: {
                         contentText: `${sectionItem.description}`,
                         // if balance is negative, it will be pink color, if positive, it will be green color
-                        color: annotatorColors.getBalanceColor(sectionItem.section.wordBalance),
+                        color: annotatorColors.getBalanceColor(sectionItem.section.goalStatus),
 
                         // top, right, bottom, left
                         margin: '0 0 0 20px',

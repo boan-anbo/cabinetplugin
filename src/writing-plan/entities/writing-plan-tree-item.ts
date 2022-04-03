@@ -115,7 +115,7 @@ export class CardTreeItem extends WritingPlanTreeItem {
     constructor(card: Card, line?: Line) {
         super(card.title ?? 'Card', TreeItemCollapsibleState.None);
         this.card = card;
-        this.tooltip = card.title ?? card.source?.fileName ?? 'Card';
+        this.tooltip = card.toMarkdown();
         this.description = card.toMarkdown();
         this.line = line;
         this.contextValue = 'card';

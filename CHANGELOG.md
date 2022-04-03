@@ -10,4 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Option to exclude regular expressions from being counted as words but keep them in the content
+- Added a button to toggle cards display on Writing Plan Outline Tree.
+- Added Writing Plan Support for Cabinet Preview;
 .

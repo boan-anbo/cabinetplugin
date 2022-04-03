@@ -1,6 +1,6 @@
 import { DecorationInstanceRenderOptions, DecorationOptions, Disposable, ExtensionContext, Position, Range, TextEditorDecorationType, ThemableDecorationAttachmentRenderOptions, window, workspace } from "vscode";
 import { arabic2roman } from "../../utils/arabic-roman";
-import { SectionTreeItem } from "../entities/section-item";
+import { SectionTreeItem } from "../entities/writing-plan-tree-item";
 import { writingPlanInstance, WritingPlanStatus } from "../writing-plan-instance";
 import { annotatorColors } from "./annotator-colors";
 
@@ -100,7 +100,7 @@ export const registerSectionDecorations = (context: ExtensionContext) => {
                             fontSize: 'smaller',
                             contentText: isCloseMarkerNextToOpenMarker ? '' : sectionItem.description,
                             // set color to beautiful light blue
-                            color: annotatorColors.getBalanceColor(sectionItem.section.wordBalance),
+                            color: annotatorColors.getBalanceColor(sectionItem.section.goalStatus),
                             // top, right, bottom, left
                             margin: '0 0 0 20px',
 

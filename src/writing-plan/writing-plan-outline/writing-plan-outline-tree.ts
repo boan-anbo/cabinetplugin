@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CardTreeItem, SectionTreeItem, WritingPlanTreeItem } from '../entities/section-item';
+import { CardTreeItem, SectionTreeItem, WritingPlanTreeItem } from '../entities/writing-plan-tree-item';
 import { InsertRelation, moveSections } from '../utils/move-sections';
 import { writingPlanInstance, WritingPlanStatus } from '../writing-plan-instance';
 
@@ -10,7 +10,7 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
     public onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
     // Keep track of any SectionItems we create so that we can re-use the same objects.
     treeView: vscode.TreeView<WritingPlanTreeItem>;
-    showCards = true;
+    showCards: boolean = true;
 
     constructor(context: vscode.ExtensionContext) {
 
@@ -31,6 +31,8 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
         // if not bind, this handler will not be able access THIS instance
         writingPlanInstance.writingPlanStatus.listener.event(this.writingPlanStatusHandler.bind(this));
 
+        this.showCards = vscode.workspace.getConfiguration('cabinetplugin.writing-plan.out').get('showCards', true);
+
     }
 
     async writingPlanStatusHandler(status: WritingPlanStatus): Promise<void> {
@@ -49,6 +51,7 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
 
     // Tree data provider 
     public getChildren(sectionItem?: WritingPlanTreeItem): WritingPlanTreeItem[] {
+
         if (sectionItem) {
             return getSectionItemChildren(sectionItem, this.showCards);
         } else {
@@ -59,7 +62,7 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
 
 
     refresh(): void {
-        console.log('refreshing')
+        console.log('refreshing');
         this._onDidChangeTreeData.fire(undefined);
     }
 
