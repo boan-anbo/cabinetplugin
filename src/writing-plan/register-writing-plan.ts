@@ -70,7 +70,9 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 
 	// register a listener for when the active editor switches to another document
 	disposables.push(vscode.window.onDidChangeActiveTextEditor(() => {
-		writingPlanInstance.refreshCurrentPlan();
+		if (writingPlanInstance) {
+			writingPlanInstance.refreshCurrentPlan();
+		}
 	}));
 
 	console.log('Writing Plan Inititated');
