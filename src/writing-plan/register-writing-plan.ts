@@ -80,4 +80,6 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 	context.subscriptions.push(...disposables);
 
 	context.subscriptions.push(...globalWritingPlanDisposables);
+
+	writingPlanInstance.refreshCurrentPlan();
 };
