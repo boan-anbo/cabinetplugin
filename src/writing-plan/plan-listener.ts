@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-import { WritingPlan } from 'writing-plan';
-import { updateStatusBarText as updatePlanStatusBarText } from './writing-plan-bar';
 import { writingPlanInstance } from './writing-plan-instance';
 
 
@@ -24,7 +22,6 @@ export const documentPlanListener = (event: vscode.TextDocumentChangeEvent) => {
             if (docText !== null) {
                 writingPlanInstance.refreshCurrentPlan(docText);
 
-                updatePlanStatusBarText();
             }
         }
     }, 200);
