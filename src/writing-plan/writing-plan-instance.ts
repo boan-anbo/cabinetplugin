@@ -72,8 +72,14 @@ export class WritingPlanInstance implements Disposable {
 
     writingPlans: (WritingPlan | null)[] = [];
 
+    /**
+     * the single source of truth for the current writing plan
+     */
     writingPlanStatus = {
         enabled: false,
+        /**
+         * The single source of truth for the current writing plan's status, those actions to take when the writing plan changes should subscribe to this event.
+         */
         listener: new EventEmitter<WritingPlanStatus>(),
     };
 

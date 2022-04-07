@@ -1,5 +1,5 @@
 import { window, workspace } from "vscode";
-import { updateStatusBarText as updateWritingPlanStatusBarText } from "../../writing-plan/writing-plan-bar";
+import { updateStatusBar as updateWritingPlanStatusBarText } from "../../writing-plan/writing-plan-bar";
 import { writingPlanInstance, WritingPlanStatus } from "../../writing-plan/writing-plan-instance";
 
 export const toggleWritingPlan = () => {
@@ -8,7 +8,6 @@ export const toggleWritingPlan = () => {
     // toggle it
     workspace.getConfiguration('cabinetplugin.writing-plan').update('enable', !writingPlanEnabled, true);
     writingPlanInstance.writingPlanStatus.enabled = !writingPlanEnabled;
-    updateWritingPlanStatusBarText();
     if (writingPlanInstance.writingPlanStatus.enabled) {
         writingPlanInstance.refreshCurrentPlan();
     } else {

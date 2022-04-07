@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { globalWritingPlanDisposables } from './register-writing-plan';
 import { writingPlanInstance } from './writing-plan-instance';
 
 
@@ -11,9 +12,10 @@ export const createStatusBar = () => {
     writingPlanInstance.writingPlanStatus.enabled = writingPlanEnabled;
     writingPlanBarItem.command = toggleWritingPlanBarCommand;
 
-    updateStatusBarText();
-
+    updateStatusBar();
     writingPlanBarItem.show();
+
+    globalWritingPlanDisposables.push(writingPlanInstance.writingPlanStatus.listener.event(() => updateStatusBar()));
 }
 
 
@@ -23,7 +25,7 @@ const toggleWritingPlanBarCommand: vscode.Command = {
     tooltip: 'Toggle Writing Plan',
 }
 
-export const updateStatusBarText = (newStatus?: string): void => {
+export const updateStatusBar = (newStatus?: string): void => {
     if (!writingPlanInstance.writingPlanStatus.enabled) {
         writingPlanBarItem.text = '$(eye-closed) Writing Plan';
         writingPlanBarItem.tooltip = 'Writing Plan is disabled';
