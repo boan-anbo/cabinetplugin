@@ -116,7 +116,13 @@
         "mac": "cmd+d cmd+d"
       }
     ],
+    
     "commands": [
+      {
+        "command": "writing-plan.processor.replaceMarkdownNotes",
+        "title": "Replace Markdown Notes",
+        "category": "Writing Plan"
+      },
       {
         "command": "writing-plan.outline.hideCards",
         "title": "Hide Cards",
@@ -345,7 +351,7 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "recompile": "npm i && npm link cabinet-node writing-plan && npm run compile",
+    "recompile": "npm i && npm link cabinet-node writing-plan markdown-note && npm run compile",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
