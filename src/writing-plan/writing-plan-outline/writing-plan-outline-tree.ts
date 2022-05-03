@@ -73,13 +73,6 @@ export class WritingPlanOutlineTree implements vscode.TreeDataProvider<WritingPl
     getParent(element: WritingPlanTreeItem): WritingPlanTreeItem | null {
         return getSectionItemParent(element);
     }
-    // getParent() {
-    //     return null;
-    // }
-
-    // public getParent(element: WritingPlanTreeItem): WritingPlanTreeItem | null {
-    //     return getSectionItemParent(element);
-    // }
 
 
     dispose(): void {
