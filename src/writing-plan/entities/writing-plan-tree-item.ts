@@ -36,7 +36,7 @@ export class SectionTreeItem extends WritingPlanTreeItem {
             collapse ?? TreeItemCollapsibleState.Expanded);
 
         // set section order string
-        this.sectionLevelOrderString = `${arabic2roman(section?.level, 1)}.${arabic2roman(section?.levelOrder, 1)}`;
+        this.sectionLevelOrderString = `${arabic2roman(section?.level, 1)}.${section?.levelOrder + 1}`;
 
         if (cabinetNodeInstance) {
             const cards = cabinetNodeInstance.getAllCardsByCciWithLineFromText(section.content);
