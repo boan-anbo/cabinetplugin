@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Card } from "cabinet-node";
+import { Card, CardExporter, CardExporterUtils } from "cabinet-node";
 import path = require("path");
 import {
         QuickPickItem,
@@ -18,11 +18,19 @@ import {
 } from "vscode";
 import { cabinetNodeInstance } from "../../extension";
 import { getFilesFromPdfFolders, getSortedFilesFromPdfFoldersByModifiedDates } from "../utils/get-all-pdfs";
-import { insertCardCci } from "../utils/insert-text";
+import { insertCardCci, insertText } from "../utils/insert-text";
 import { getSelectedZoteroPaths } from "../zotero-utils/get-zotero-attachments";
 import { FileItem } from "./file-item";
 import { CardItem } from "./card-item";
 
+export enum NotesActionType {
+        InsertIntoDocument = 'Insert into Current Document',
+        GenerateDocuments = 'Generate Documents',
+}
+
+export enum GenerateDocumenType {
+        ReadingReport = 'Reading Report',
+}
 
 export enum fileSourceType {
         FOLDERS = 'Folders',
@@ -148,7 +156,7 @@ export async function extractPdfCards(context: ExtensionContext) {
                         step: 2,
                         totalSteps: 4,
                         value: typeof state.fileItem === "string" ? state.fileItem : "",
-                        prompt: "Pick extraction action",
+                        prompt: "Select pages to extract, default to all pages",
                         validate: validateInputPages,
                         shouldResume: shouldResume,
                 });
@@ -190,28 +198,102 @@ export async function extractPdfCards(context: ExtensionContext) {
                         activeItem: undefined,
                         buttons: [createResourceGroupButton],
                         shouldResume: shouldResume,
+                        selectAll: true,
                 }
                 );
                 // console.log(selectedCards);
                 state.selectedCards = selectedCards.map(cardItem => cardItem.card);
-
-                // return (input: MultiStepInput) => pickRuntime(input, state);
+                return (input: MultiStepInput) => pickNoteActions(input, state);
         }
 
-        // async function pickRuntime(input: MultiStepInput, state: Partial<State>) {
-        //         const additionalSteps = typeof state.resourceGroup === 'string' ? 1 : 0;
-        //         const runtimes = await getAvailableRuntimes(state.resourceGroup!, undefined /* TODO: token */);
-        //         // TODO: Remember currently active item when navigating back.
-        //         state.runtime = await input.showQuickPick({
-        //                 title,
-        //                 step: 3 + additionalSteps,
-        //                 totalSteps: 3 + additionalSteps,
-        //                 placeholder: 'Pick a runtime',
-        //                 items: runtimes,
-        //                 activeItem: state.runtime,
-        //                 shouldResume: shouldResume
-        //         });
-        // }
+        async function pickNoteActions(input: MultiStepInput, state: Partial<State>) {
+
+                const notesActions: QuickPickItem[] = [
+                        NotesActionType.InsertIntoDocument.toString(),
+                        NotesActionType.GenerateDocuments.toString(),
+                ].map(label => ({ label }));
+
+                const pick = await input.showQuickPick<
+                        QuickPickItem,
+                        QuickPickParameters<QuickPickItem>
+                >({
+                        title,
+                        step: 1,
+                        totalSteps: 3,
+                        placeholder: "Pick Notes Actions",
+                        items: notesActions,
+                        activeItem: notesActions[0],
+                        buttons: [],
+                        shouldResume: shouldResume,
+                });
+
+                if (!state.selectedCards || state.selectedCards.length === 0) {
+                        // show to vscode user
+                        const errorMessage = 'No notes selected';
+                        window.showErrorMessage(errorMessage);
+                        return;
+                }
+                switch (pick.label) {
+                        case NotesActionType.InsertIntoDocument:
+                                window.showInformationMessage(`Inserting received '${state.selectedCards?.length}' cards\n${state.fileItem?.label ?? ''}.`);
+
+                                cabinetNodeInstance?.addCards(state.selectedCards);
+                                await insertCardCci(state.selectedCards);
+                                return;
+
+                        case NotesActionType.GenerateDocuments:
+                                return (input: MultiStepInput) => pickGenerateDocumentType(input, state);
+                }
+        }
+
+        async function pickGenerateDocumentType(input: MultiStepInput, state: Partial<State>) {
+                if (!state.selectedCards || state.selectedCards.length === 0) {
+                        // show to vscode user
+                        const errorMessage = 'No notes selected';
+                        window.showErrorMessage(errorMessage);
+                }
+                const generateDocumentTypes: QuickPickItem[] = [
+                        GenerateDocumenType.ReadingReport.toString()
+                ].map(label => ({ label }));
+
+                const pick = await input.showQuickPick<
+                        QuickPickItem,
+                        QuickPickParameters<QuickPickItem>
+                >({
+                        title,
+                        step: 1,
+                        totalSteps: 3,
+                        placeholder: "Pick Type of Document to Generate from the Notes",
+                        items: generateDocumentTypes,
+                        activeItem: generateDocumentTypes[0],
+                        buttons: [],
+                        shouldResume: shouldResume,
+                });
+
+                switch (pick.label) {
+                        case GenerateDocumenType.ReadingReport:
+                                // show to vscode user
+                                const exporter = new CardExporter();
+                                const selectedNotes = state.selectedCards;
+                                if (!selectedNotes || selectedNotes.length === 0) {
+                                        // show to vscode user
+                                        const errorMessage = 'No notes selected';
+                                        window.showErrorMessage(errorMessage);
+                                        return;
+                                }
+                                // add only those cards needed for the report to local cabinet storage
+                                const reportCards = CardExporterUtils.getAllReportCards(selectedNotes);
+                                cabinetNodeInstance?.addCards(reportCards);
+                                // generate the report
+                                const result = exporter.readingReport(selectedNotes);
+                                // insert result into current document
+                                insertText(result);
+                                break;
+                
+                        default:
+                                break;
+                }
+        }
 
         function shouldResume() {
                 // Could show a notification with the option to resume.
@@ -245,12 +327,8 @@ export async function extractPdfCards(context: ExtensionContext) {
                 return ["Node 8.9", "Node 6.11", "Node 4.5"].map((label) => ({ label }));
         }
 
-        const state = await collectInputs();
+        await collectInputs();
 
-        window.showInformationMessage(`Inserting received '${state.selectedCards?.length}' cards\n${state.fileItem.label}.`);
-
-        cabinetNodeInstance?.addCards(state.selectedCards);
-        await insertCardCci(state.selectedCards);
 }
 
 // -------------------------------------------------------
@@ -272,6 +350,7 @@ interface QuickPickParameters<T extends QuickPickItem> {
         items: T[];
         activeItem?: T;
         placeholder: string;
+        selectAll?: boolean;
         buttons?: QuickInputButton[];
         shouldResume: () => Thenable<boolean>;
 }
@@ -395,6 +474,7 @@ class MultiStepInput {
                 items,
                 activeItem,
                 placeholder,
+                selectAll,
                 buttons,
                 shouldResume,
         }: P) {
@@ -410,6 +490,11 @@ class MultiStepInput {
                                 input.totalSteps = totalSteps;
                                 input.placeholder = placeholder;
                                 input.items = items;
+
+                                if (selectAll) {
+                                        input.selectedItems = items;
+                                }
+
                                 if (activeItem) {
                                         input.activeItems = [activeItem];
                                 }
