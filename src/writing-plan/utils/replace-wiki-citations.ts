@@ -1,4 +1,4 @@
-import {replaceAllNotes} from 'markdown-note';
+import {wikijsProcessor} from 'wikijs-processor';
 // import vscode
 import {window, workspace} from 'vscode';
 // import fs
@@ -6,7 +6,7 @@ import * as fs from 'fs';
 
 export const replaceWikiCitations = async (text: string): Promise<string> => {
 
-    const result = await replaceAllNotes(text, {
+    const result = await wikijsProcessor(text, {
         bibliographySectionTitle: '# Bibliography',
         referenceSectionTitle: '',
     });

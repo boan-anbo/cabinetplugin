@@ -176,7 +176,7 @@
       },
       {
         "command": "cabinetplugin.extractPdfCards",
-        "title": "Extract Cards From Pdfs",
+        "title": "Cards Actions",
         "category": "Cabinet"
       },
       {
@@ -351,7 +351,7 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "recompile": "npm i && npm link cabinet-node writing-plan markdown-note && npm run compile",
+    "recompile": "npm i && npm link cabinet-node writing-plan wikijs-processor && npm run compile",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },

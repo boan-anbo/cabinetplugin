@@ -24,7 +24,7 @@ import { copyLatexCodeLensProvider, copyLatexCommand } from './cabinet-core/code
 import { updateDefaultSettings } from './cabinet-core/utils/update-default-setting';
 import { openCardSourceFile } from './cabinet-core/utils/open-source-file';
 import { ExtensionContext } from 'vscode';
-import { extractPdfCards as extractPdfCards } from './cabinet-core/quickactions/extract-pdf-cards';
+import { extractPdfCards as extractPdfCards } from './cabinet-core/quickactions/card-actions';
 import { quickOpen } from './cabinet-core/quickactions/quick-open-file';
 import { cabinetInstanceActions as cabinetActions } from './cabinet-core/quickactions/cabinet-actions';
 import { testDisserator } from './cabinet-core/disserator/test-disserator';

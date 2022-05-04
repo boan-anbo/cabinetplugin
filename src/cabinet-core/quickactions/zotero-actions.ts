@@ -201,7 +201,7 @@ export async function zoteroActions(context: ExtensionContext) {
                 });
         }
 
-        const state = await collectInputs();
+        await collectInputs();
 
 
 }
