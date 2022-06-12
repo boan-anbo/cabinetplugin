@@ -14,6 +14,7 @@ import { copySkeletonPlanToVscodeClipboard, writeSkeletonCopyIntoNewFile } from 
 import { WritingPlanTreeItem } from './entities/writing-plan-tree-item';
 import { writingPlanInstance } from './writing-plan-instance';
 import { hideOutlineCards, showOutlineCards, toggleOutlineShowCards } from './writing-plan-outline/toggle-outline-show-cards';
+import { writeCurrentDocumentIntoAnotherFile } from './utils/replace-wiki-citations';
 
 export let writingPlanTreeView: WritingPlanOutlineTree | undefined = undefined;
 
@@ -61,6 +62,10 @@ export const registerWritingPlan = (context: vscode.ExtensionContext) => {
 	// register toggle cards on outline
 	disposables.push(vscode.commands.registerCommand('writing-plan.outline.showCards', showOutlineCards));
 	disposables.push(vscode.commands.registerCommand('writing-plan.outline.hideCards', hideOutlineCards));
+	// register replace all markdown notes command
+	disposables.push(vscode.commands.registerCommand('writing-plan.processor.replaceMarkdownNotes', async () => {
+		await writeCurrentDocumentIntoAnotherFile();
+	}));
 
 	// register section decorators
 	registerSectionDecorations(context);
