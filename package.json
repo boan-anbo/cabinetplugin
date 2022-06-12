@@ -98,22 +98,22 @@
       {
         "command": "cabinetplugin.extractPdfCards",
         "key": "ctrl+alt+shift+e",
-        "mac": "cmd+e cmd+e"
+        "mac": ""
       },
       {
         "command": "cabinetplugin.cabinetActions",
         "key": "ctrl+alt+shift+c",
-        "mac": "cmd+c cmd+c"
+        "mac": ""
       },
       {
         "command": "cabinetplugin.zoteroActions",
         "key": "ctrl+alt+shift+z",
-        "mac": "cmd+z cmd+z"
+        "mac": ""
       },
       {
         "command": "cabinetplugin.disseratorActions",
         "key": "ctrl+alt+shift+d",
-        "mac": "cmd+d cmd+d"
+        "mac": ""
       }
     ],
     "commands": [
