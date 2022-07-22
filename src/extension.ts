@@ -33,6 +33,7 @@ import { registerWritingPlan } from './writing-plan/register-writing-plan';
 import { cabinetCursorChangeListener } from './cabinet-core/liseners/cursor-change-listener';
 import { toggleWritingPlan } from './cabinet-core/commands/toggle-writing-plan';
 import { zoteroActions } from './cabinet-core/quickactions/zotero-actions';
+import { outputCsvFromDocumentCards } from './cabinet-core/commands/output-csv-from-document-cards';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -225,6 +226,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			context.subscriptions.push(vscode.commands.registerCommand("cabinetplugin.copyLatex", copyLatexCommand));
 
 			context.subscriptions.push(vscode.languages.registerCodeLensProvider("*", copyLatexCodeLensProvider));
+
+			context.subscriptions.push(
+				vscode.commands.registerCommand("cabinetplugin.exportCsv", outputCsvFromDocumentCards(cabinetNodeInstance)));
 
 
 			(cabinetNodeInstance as CabinetNode).onCabinetFileChangeLoaded = updateCurrentCards;

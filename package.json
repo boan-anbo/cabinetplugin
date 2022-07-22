@@ -202,6 +202,11 @@
         "category": "Cabinet"
       },
       {
+"command": "cabinetplugin.exportCsv",
+"title": "Export CSV",
+"category": "Cabinet"
+      },
+      {
         "command": "cabinetplugin.showPreview",
         "title": "[C] Preview",
         "category": "Cabinet"
