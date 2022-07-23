@@ -2,7 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-
+import * as fs from 'fs';
 import { Card, CardExporter, CardExporterUtils } from "cabinet-node";
 import path = require("path");
 import {
@@ -15,6 +15,7 @@ import {
         ExtensionContext,
         QuickInputButtons,
         Uri,
+        workspace,
 } from "vscode";
 import { cabinetNodeInstance } from "../../extension";
 import { getFilesFromPdfFolders, getSortedFilesFromPdfFoldersByModifiedDates } from "../utils/get-all-pdfs";
@@ -22,6 +23,7 @@ import { insertCardCci, insertText } from "../utils/insert-text";
 import { getSelectedZoteroPaths } from "../zotero-utils/get-zotero-attachments";
 import { FileItem } from "./file-item";
 import { CardItem } from "./card-item";
+import { replaceWikiCitations } from '../../writing-plan/utils/replace-wiki-citations';
 
 export enum NotesActionType {
         InsertIntoDocument = 'Insert into Current Document',
@@ -284,12 +286,50 @@ export async function extractPdfCards(context: ExtensionContext) {
                                 // add only those cards needed for the report to local cabinet storage
                                 const reportCards = CardExporterUtils.getAllReportCards(selectedNotes);
                                 cabinetNodeInstance?.addCards(reportCards);
+
+                                console.log("About to generate reading reports on selected notes", selectedNotes);
                                 // generate the report
-                                const result = exporter.readingReport(selectedNotes);
-                                // insert result into current document
-                                insertText(result);
+                                try {
+                                        const result = exporter.readingReport(selectedNotes, {
+                                                tags: [
+                                                        "reading-notes",
+                                                        "research"
+                                                ]
+                                        });
+                                        // insert result into current document
+                                        const documentTitleArray = selectedNotes[0].source?.fileName?.split('.');
+                                        documentTitleArray?.pop();
+                                        const documentTitle = documentTitleArray?.join('.');
+                                        // write the report to a new file with .mdc extension to the current folder, using the document title extracted from the first card fed into it.
+
+                                        // save to the current active workspace fold
+                                        const currentActiveDocumentPath = window.activeTextEditor?.document.uri.fsPath;
+
+                                        if (currentActiveDocumentPath) {
+                                                const currentActiveFolderPath = path.dirname(currentActiveDocumentPath);
+                                                const mdcFilePath = path.join(currentActiveFolderPath, `${documentTitle}.mdc`);
+                                                fs.writeFileSync(mdcFilePath, result);
+                                                window.showInformationMessage(`Generated reading report for '${selectedNotes.length}' notes\n${documentTitle}.`);
+
+                                                const processedWikiMd = await replaceWikiCitations(result);
+                                                // write md to the same folder as the mdc file
+                                                const mdFilePath = path.join(currentActiveFolderPath, `${documentTitle}.md`);
+                                                fs.writeFileSync(
+                                                        mdFilePath,
+                                                        processedWikiMd
+                                                );
+                                                window.showInformationMessage(`Processed Reading Report for Wiki Js for ${documentTitle}.`);
+                                                return;
+                                        } else {
+                                                window.showErrorMessage(`No active workspace folder found to save reading report.`);
+                                                return;
+                                        }
+
+                                } catch (error) {
+                                        console.error(error);
+                                }
                                 break;
-                
+
                         default:
                                 break;
                 }
